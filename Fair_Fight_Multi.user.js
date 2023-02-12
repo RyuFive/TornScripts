@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name        Fair Fight multi
+// @author RyuFive
 // @match      https://www.torn.com/profiles.php*
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Fair_Fight_Multi.user.js
 // @version      0.1
@@ -8,11 +9,6 @@
 // @license MIT
 // @grant none
 // ==/UserScript==
-
-
-// ==OpenUserJS==
-// @author RyuFive
-// ==/OpenUserJS==
 
 var stat = 5 * 1000000000
 
