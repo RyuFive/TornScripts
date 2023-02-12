@@ -1,16 +1,13 @@
 // ==UserScript==
 // @name         Chat Img
+// @author RyuFive
 // @match      https://www.torn.com/*
-// @namespace    https://openuserjs.org/users/RyuFive/Chat_Img
+// @namespace    https://github.com/RyuFive/Chat-Img/raw/main/Chat_Img.user.js
 // @version      0.2
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
 // ==/UserScript==
-
-// ==OpenUserJS==
-// @author RyuFive
-// ==/OpenUserJS==
 
 var MutationObserver = window.MutationObserver;
 var myObserver = new MutationObserver(mutationHandler);
