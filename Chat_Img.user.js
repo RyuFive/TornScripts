@@ -3,7 +3,8 @@
 // @author RyuFive
 // @match      https://www.torn.com/*
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Chat_Img.user.js
-// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Chat_Img.user.js
+// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Chat_Img.js
+// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Chat_Img.js
 // @version      0.3
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
