@@ -54,21 +54,6 @@ function refreshData()
         }
         bonus.innerHTML = value + name
 
-        /*
-
-        var background = GM.getValue(name, false)
-        bonus.onclick = function () {
-            background = !background
-            GM.setValue(name, background);
-            console.log(await GM.getValue(name))
-            if (background == true) bonus.setAttribute('style','background-color: red')
-            else bonus.setAttribute('style','')
-        };*/
-        const good = ['Revitalize', 'Warlord']
-        for (var y in good) {
-            if (good[y] == name) bonus.setAttribute('style', 'background-color: red')
-        }
-
         icons[i].appendChild(bonus)
     }
 
