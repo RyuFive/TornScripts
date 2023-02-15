@@ -5,7 +5,7 @@
 // @match      https://www.torn.com/amarket.php*
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
-// @version      0.7
+// @version      0.8
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
