@@ -6,7 +6,7 @@
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
-// @version      1.0
+// @version      1.1
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -29,8 +29,13 @@ function refreshData()
     }
 
     for (let i = 0; i < icons.length; i++) {
-        if (icons[i].lastChild.tagName == 'SPAN') continue
-        var bonus = document.createElement('span')
+        var title = icons[i].parentElement.parentElement.parentElement.getElementsByClassName("title")[0]
+        var removeThis = title.getElementsByClassName("t-gray-6")[0]
+        if (removeThis) {
+            title.removeChild(removeThis)
+        }
+        // if (icons[i].lastChild.tagName == 'SPAN) continue
+        if (title.childElementCount >= 1 + icons[i].parentElement.childElementCount) continue
 
         var name = icons[i].title.split('>')[1].split('<')[0]
         var value = icons[i].title.split('%')[0].split('>')[3] + "% "
@@ -55,17 +60,21 @@ function refreshData()
         else if (name == 'Eviscerate') {
             value = icons[i].title.split(' extra')[0].split('them ')[1] + " "
         }
+
+        var bonus = document.createElement('p')
         bonus.innerHTML = value + name
-        if (mode == 'dark') {
-            bonus.setAttribute("style", "background-color: #000000b0;")
-        }
-        else {
-            bonus.setAttribute("style", "background-color: #ffffffb0;")
-        }
+
+        title.appendChild(bonus)
+        // if (mode == 'dark') {
+        //     bonus.setAttribute("style", "background-color: #000000b0;")
+        // }
+        // else {
+        //     bonus.setAttribute("style", "background-color: #ffffffb0;")
+        // }
 
 
-        icons[i].appendChild(bonus)
-        icons[i].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
+        // icons[i].appendChild(bonus)
+        // icons[i].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
     }
 
     setTimeout(refreshData, x*1000);
