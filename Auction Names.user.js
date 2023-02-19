@@ -6,13 +6,15 @@
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
-// @version      0.9
+// @version      1.0
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
 // @grant GM_setValue
 // @grant GM_getValue
 // ==/UserScript==
+
+var mode = 'dark' // dark or light
 
 function refreshData()
 {
@@ -54,7 +56,13 @@ function refreshData()
             value = icons[i].title.split(' extra')[0].split('them ')[1] + " "
         }
         bonus.innerHTML = value + name
-        bonus.setAttribute("style", "background-color: #00000060;")
+        if (mode == 'dark') {
+            bonus.setAttribute("style", "background-color: #000000b0;")
+        }
+        else {
+            bonus.setAttribute("style", "background-color: #ffffffb0;")
+        }
+
 
         icons[i].appendChild(bonus)
         icons[i].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
