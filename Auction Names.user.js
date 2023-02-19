@@ -34,7 +34,6 @@ function refreshData()
         if (removeThis) {
             title.removeChild(removeThis)
         }
-        // if (icons[i].lastChild.tagName == 'SPAN) continue
         if (title.childElementCount >= 1 + icons[i].parentElement.childElementCount) continue
 
         var name = icons[i].title.split('>')[1].split('<')[0]
@@ -65,16 +64,6 @@ function refreshData()
         bonus.innerHTML = value + name
 
         title.appendChild(bonus)
-        // if (mode == 'dark') {
-        //     bonus.setAttribute("style", "background-color: #000000b0;")
-        // }
-        // else {
-        //     bonus.setAttribute("style", "background-color: #ffffffb0;")
-        // }
-
-
-        // icons[i].appendChild(bonus)
-        // icons[i].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
     }
 
     setTimeout(refreshData, x*1000);
