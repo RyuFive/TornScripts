@@ -3,9 +3,9 @@
 // @author RyuFive
 // @match      https://www.torn.com/displaycase.php*
 // @match      https://www.torn.com/amarket.php*
-// @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
-// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
-// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
+// @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
+// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.js
+// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.js
 // @version      1.2
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
