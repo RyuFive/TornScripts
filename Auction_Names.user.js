@@ -7,7 +7,7 @@
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      1.35
+// @version      1.36
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -44,22 +44,23 @@ function amarket()
 }
 
 function displaycase() {
-    var icons = $(".bonus-attachment-icons")
-    console.log("hi")
+    var items = $(".bonus-attachment-icons").parents("div.iconsbonuses")
 
-    if (icons.length === 0) {
+    if (items.length === 0) {
         return
     }
 
-    for (var i in icons) {
+    for (var i in items) {
         if (!isIntNumber(i)) continue
-        var title = icons[i].title
+        var title = $(items[i]).find("span.bonus-attachment-icons")[0].title
         if (title == '') continue
 
         var name = title.split('>')[1].split('<')[0]
         var value = format(title, name)
 
         var bonus = document.createElement('span')
+        var br = document.createElement('br')
+
         bonus.innerHTML = value + name
         if (mode == 'dark') {
             bonus.setAttribute("style", "background-color: #000000b0;")
@@ -67,8 +68,27 @@ function displaycase() {
         else {
             bonus.setAttribute("style", "background-color: #ffffffb0;")
         }
-        icons[i].appendChild(bonus)
-        icons[i].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
+        $(items[i]).find("span.bonus-attachment-icons")[0].appendChild(bonus)
+        $(items[i]).find("span.bonus-attachment-icons")[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
+
+        var second = $(items[i]).find("span.bonus-attachment-icons")[1]
+        if (second != undefined) {
+            items[i].insertBefore(br, second)
+            title = second.title
+            name = title.split('>')[1].split('<')[0]
+            value = format(title, name)
+            var bonus2 = document.createElement('span')
+
+            bonus2.innerHTML = value + name
+            if (mode == 'dark') {
+                bonus2.setAttribute("style", "background-color: #000000b0;")
+            }
+            else {
+                bonus2.setAttribute("style", "background-color: #ffffffb0;")
+            }
+            second.appendChild(bonus2)
+            second.setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
+        }
     }
 }
 
