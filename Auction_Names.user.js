@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Auction Names
 // @author RyuFive
-// @match      https://www.torn.com/displaycase.php*
 // @match      https://www.torn.com/amarket.php*
-// @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
-// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
-// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
-// @version      1.2
+// @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
+// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
+// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.js
+// @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
+// @version      1.3
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -18,69 +18,55 @@ var mode = 'dark' // dark or light
 
 function refreshData()
 {
-    var x = 1; // 1 Seconds
+    $(".t-gray-6").html("")
 
-    // Do your thing here
-    var icons = document.querySelectorAll(".bonus-attachment-icons")
+    var row = $(".bonus-attachment-icons").parents("div.item-cont-wrap")
 
-    if (icons.length === undefined || icons.length === 0) {
-        setTimeout(refreshData, x*1000);
+    if (row.length === 0) {
         return
     }
 
-    for (let i = 0; i < icons.length; i++) {
+    for (var i in row) {
+        if (!isIntNumber(i)) continue
         if (document.URL.includes('amarket')) {
-            var title = icons[i].parentElement.parentElement.parentElement.getElementsByClassName("title")[0]
-            var removeThis = title.getElementsByClassName("t-gray-6")[0]
-            if (removeThis) {
-                title.removeChild(removeThis)
-            }
-            if (title.childElementCount >= 1 + icons[i].parentElement.childElementCount) continue
+            var title = $(row[i]).find("span.bonus-attachment-icons")[0].title
+            if (title == '') continue
         }
-        else if (icons[i].lastChild.tagName == 'SPAN') continue
 
-        var name = icons[i].title.split('>')[1].split('<')[0]
-        var value = icons[i].title.split('%')[0].split('>')[3] + "% "
+        var name = title.split('>')[1].split('<')[0]
+        var value = format(title, name)
 
-        if (name == 'Irradiate' || name == 'Smash') {
-            value = ''
+        $(row[i]).find("p.t-gray-6")[0].innerHTML = value + name
+        if ($(row[i]).find("span.bonus-attachment-icons")[1] != undefined) {
+            title = $(row[i]).find("span.bonus-attachment-icons")[1].title
+            name = title.split('>')[1].split('<')[0]
+            value = format(title, name)
+            $(row[i]).find("p.t-gray-6")[0].innerHTML += "<br>" + value + name
         }
-        else if (name == 'Disarm') {
-            value = icons[i].title.split(' turns')[0].split('for ')[1] + " T "
-        }
-        else if (name == 'Bloodlust') {
-            value = icons[i].title.split(' of')[0].split('by ')[1] + " "
-
-        }
-        else if (name == 'Execute') {
-            value = icons[i].title.split(' life')[0].split('below ')[1] + " "
-        }
-        else if (name == 'Penetrate') {
-            value = icons[i].title.split(' of')[0].split('Ignores ')[1] + " "
-        }
-        else if (name == 'Eviscerate') {
-            value = icons[i].title.split(' extra')[0].split('them ')[1] + " "
-        }
-        if (document.URL.includes('amarket')) var bonus = document.createElement('p')
-        else bonus = document.createElement('span')
-
-        bonus.innerHTML = value + name
-
-        if (document.URL.includes('amarket')) title.appendChild(bonus)
-        else {
-            if (mode == 'dark') {
-                bonus.setAttribute("style", "background-color: #000000b0;")
-            }
-            else {
-                bonus.setAttribute("style", "background-color: #ffffffb0;")
-            }
-            icons[i].appendChild(bonus)
-            icons[i].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
-        }
-        
     }
-
-    setTimeout(refreshData, x*1000);
 }
 
-refreshData()
+function format(title, name) {
+    var value = title.split('%')[0].split('>')[3] + "% "
+    if (name == 'Irradiate' || name == 'Smash') {
+        value = ''
+    }
+    else if (name == 'Disarm') {
+        value = title.split(' turns')[0].split('for ')[1] + " T "
+    }
+    else if (name == 'Bloodlust') {
+        value = title.split(' of')[0].split('by ')[1] + " "
+    }
+    else if (name == 'Execute') {
+        value = title.split(' life')[0].split('below ')[1] + " "
+    }
+    else if (name == 'Penetrate') {
+        value = title.split(' of')[0].split('Ignores ')[1] + " "
+    }
+    else if (name == 'Eviscerate') {
+        value = title.split(' extra')[0].split('them ')[1] + " "
+    }
+    return value
+}
+
+waitForKeyElements(".item-cont-wrap ", refreshData)
