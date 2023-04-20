@@ -7,13 +7,11 @@
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      1.37
+// @version      1.4
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
 // ==/UserScript==
-
-var mode = 'dark' // dark or light
 
 function amarket()
 {
@@ -44,6 +42,8 @@ function amarket()
 }
 
 function displaycase() {
+    var darkmode = $("#dark-mode-state")[0].checked // dark or light
+
     var items = $(".bonus-attachment-icons").parents("div.iconsbonuses")
 
     if (items.length === 0) {
@@ -62,7 +62,7 @@ function displaycase() {
         var br = document.createElement('br')
 
         bonus.innerHTML = value + name
-        if (mode == 'dark') {
+        if (darkmode) {
             bonus.setAttribute("style", "background-color: #000000b0;")
         }
         else {
@@ -80,7 +80,7 @@ function displaycase() {
             var bonus2 = document.createElement('span')
 
             bonus2.innerHTML = value + name
-            if (mode == 'dark') {
+            if (darkmode) {
                 bonus2.setAttribute("style", "background-color: #000000b0;")
             }
             else {
