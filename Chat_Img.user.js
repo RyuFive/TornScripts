@@ -86,15 +86,34 @@ function doImages(span) {
         // Catch image links
         if (link.includes('imgur') || link.includes('gyazo') || link.includes('png') || link.includes('jpg')) {
             // Clean and format image links
-            if (!link.includes('png') && !link.includes('jpg')) {
+            if (link.includes('gyazo')) {
                 var splice = link.split('//')
+                var splice2 = link.split('//')
+                splice.splice(1, 0, "//i.")
+                splice.splice(4, 0, ".jpg")
+                link = splice.join('')
+                splice2.splice(1, 0, "//i.")
+                splice2.splice(4, 0, ".png")
+                var link2 = splice2.join('')
+
+                var x = document.createElement('div')
+                var s = '<a href='+link+' class="Ryu" target="_blank"><img src="'+link+'" alt = "" style="width: -webkit-fill-available;"/></a>'
+                var s2 = '<a href='+link2+' class="Ryu" target="_blank"><img src="'+link2+'" alt = "" style="width: -webkit-fill-available;"/></a>'
+                x.innerHTML = s + s2
+                span.appendChild(x)
+                child.hidden = true
+                continue
+            }
+            else if (!link.includes('png') && !link.includes('jpg') && !link.includes('jpeg') && !link.includes('gif')) {
+                // If no .extension add png
+                splice = link.split('//')
                 splice.splice(1, 0, "//i.")
                 splice.splice(4, 0, ".png")
                 link = splice.join('')
             }
             // Create image element
-            var x = document.createElement('div')
-            var s = '<a href='+link+' class="Ryu" target="_blank"><img src="'+link+'" style="width: -webkit-fill-available;"/></a>';
+            x = document.createElement('div')
+            s = '<a href='+link+' class="Ryu" target="_blank"><img src="'+link+'" style="width: -webkit-fill-available;"/></a>'
             x.innerHTML = s
             span.appendChild(x)
             child.hidden = true
@@ -103,6 +122,8 @@ function doImages(span) {
 }
 
 function moveDown(span, delay=500) {
-    var view = span.parentElement.parentElement.parentElement
-    setTimeout(function () { view.scrollTop = view.scrollHeight }, delay);
+    if (span && span.parentElement && span.parentElement.parentElement && span.parentElement.parentElement.parentElement) {
+        var view = span.parentElement.parentElement.parentElement
+        setTimeout(function () { view.scrollTop = view.scrollHeight }, delay);
+    }
 }
