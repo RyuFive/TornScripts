@@ -5,7 +5,7 @@
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Chat_Img.user.js
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Chat_Img.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Chat_Img.js
-// @version      0.4
+// @version      0.5
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -84,7 +84,18 @@ function doImages(span) {
         // Simplify link
         var link = child.href
         // Catch image links
-        if (link.includes('imgur') || link.includes('gyazo') || link.includes('png') || link.includes('jpg')) {
+        if (link.includes('youtu.be') || link.includes('www.youtube')) {
+
+            var code = link.split("?v=")[1]
+            code = code.split("&")[0]
+
+            // Create video element
+            x = document.createElement('div')
+            s = '<iframe src=//youtube.com/embed/'+code+' class="Ryu" frameborder="0"></iframe>'
+            x.innerHTML = s
+            span.appendChild(x)
+        }
+        else if (link.includes('imgur') || link.includes('gyazo') || link.includes('png') || link.includes('jpg')) {
             // Clean and format image links
             if (link.includes('gyazo')) {
                 var splice = link.split('//')
