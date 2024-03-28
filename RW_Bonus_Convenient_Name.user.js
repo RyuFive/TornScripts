@@ -1,8 +1,9 @@
 // ==UserScript==
-// @name         Auction Names
+// @name         RW Bonus Convenient Name
 // @author RyuFive
 // @match      https://www.torn.com/displaycase.php*
 // @match      https://www.torn.com/amarket.php*
+// @match      https://www.torn.com/bazaar.php?userId=*
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
@@ -92,6 +93,56 @@ function displaycase() {
     }
 }
 
+function bazaar(triggered) {
+    var darkmode = $("#dark-mode-state")[0].checked // dark or light
+
+    // var items = $(".bonus-attachment-icons").parents("div.iconsbonuses")
+    if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
+        var name = triggered[0].childNodes[0].childNodes[0].className.split('-')[2]
+        name = name.charAt(0).toUpperCase() + name.slice(1)
+
+        if (name == "Full") name = "Full Block"
+        if (name == "Negative") name = "Status Effects"
+        if (name == "Sentinel") name = "Defense"
+        if (name == "Vanguard") name = "Dexterity"
+        if (name == "Negative") name = "Status Effects"
+
+
+        var bonus = document.createElement('span')
+        var br = document.createElement('br')
+
+        bonus.innerHTML = name
+        if (darkmode) {
+            bonus.setAttribute("style", "background-color: #000000b0;")
+        }
+        else {
+            bonus.setAttribute("style", "background-color: #ffffffb0;")
+        }
+        triggered[0].appendChild(bonus)
+        triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top: 0px")
+
+        // var second = triggered[0].find("div")[1]
+        if (triggered[0].childElementCount == 3) {
+            name = triggered[0].childNodes[1].childNodes[0].className.split('-')[2]
+            name = name.charAt(0).toUpperCase() + name.slice(1)
+
+            if (name != undefined) {
+                var bonus2 = document.createElement('span')
+
+                bonus2.innerHTML = name
+                if (darkmode) {
+                    bonus2.setAttribute("style", "background-color: #000000b0;")
+                }
+                else {
+                    bonus2.setAttribute("style", "background-color: #ffffffb0;")
+                }
+                triggered[0].appendChild(bonus2)
+                triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:0px")
+            }
+        }
+    }
+}
+
 function format(title, name) {
     var value = title.split('%')[0].split('>')[3] + "% "
     if (name == 'Irradiate' || name == 'Smash') {
@@ -117,3 +168,4 @@ function format(title, name) {
 
 waitForKeyElements(".item-cont-wrap ", amarket)
 waitForKeyElements(".display-main-page ", displaycase)
+waitForKeyElements(".iconBonuses____iFjZ", bazaar)
