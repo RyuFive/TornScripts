@@ -124,7 +124,6 @@ function bazaar(triggered) {
 
         if (triggered[0].childElementCount == 2) {
             name = triggered[0].childNodes[1].childNodes[0].className.split('-')[2]
-            console.log(triggered[0])
             name = name.charAt(0).toUpperCase() + name.slice(1)
 
             if (name != undefined) {
