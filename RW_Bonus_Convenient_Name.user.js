@@ -8,11 +8,12 @@
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      2.0
+// @version      2.1
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
 // ==/UserScript==
+
 
 function amarket()
 {
@@ -118,12 +119,12 @@ function bazaar(triggered) {
         else {
             bonus.setAttribute("style", "background-color: #ffffffb0;")
         }
-        triggered[0].appendChild(bonus)
-        triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top: 0px")
+        triggered[0].childNodes[0].appendChild(bonus)
+        triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top: 3px;display:inline-block !important")
 
-        // var second = triggered[0].find("div")[1]
-        if (triggered[0].childElementCount == 3) {
+        if (triggered[0].childElementCount == 2) {
             name = triggered[0].childNodes[1].childNodes[0].className.split('-')[2]
+            console.log(triggered[0])
             name = name.charAt(0).toUpperCase() + name.slice(1)
 
             if (name != undefined) {
@@ -136,8 +137,8 @@ function bazaar(triggered) {
                 else {
                     bonus2.setAttribute("style", "background-color: #ffffffb0;")
                 }
-                triggered[0].appendChild(bonus2)
-                triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:0px")
+                triggered[0].childNodes[1].appendChild(bonus2)
+                triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top:3px;display:inline-block !important")
             }
         }
     }
