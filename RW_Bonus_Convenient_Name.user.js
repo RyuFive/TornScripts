@@ -9,7 +9,7 @@
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      3.0
+// @version      3.1
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -25,7 +25,8 @@ GM_addStyle(`
   width: 133px !important;
 }
 .double {
-  height: 64px !important;
+  height: 40px !important;
+  line-height: 20px !important;
 }
 }
 #armoury-armour{
@@ -36,7 +37,8 @@ GM_addStyle(`
   width: 133px !important;
 }
 .double {
-  height: 64px !important;
+  height: 40px !important;
+  line-height: 20px !important;
 }
 }
 `)
