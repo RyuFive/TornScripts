@@ -4,12 +4,12 @@
 // @match      https://www.torn.com/displaycase.php*
 // @match      https://www.torn.com/amarket.php*
 // @match      https://www.torn.com/bazaar.php*
-// @match      https://www.torn.com/factions.php?step=your&type=1*
+// @match      https://www.torn.com/factions.php?step*
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      2.5
+// @version      2.6
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
