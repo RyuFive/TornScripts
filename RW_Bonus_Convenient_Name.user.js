@@ -9,7 +9,7 @@
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      2.6
+// @version      3.0
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -128,11 +128,10 @@ function bazaar(triggered) {
         var name = triggered[0].childNodes[0].childNodes[0].className.split('-')[2]
         name = name.charAt(0).toUpperCase() + name.slice(1)
 
-        if (name == "Full") name = "Full Block"
-        if (name == "Negative") name = "Status Effects"
-        if (name == "Sentinel") name = "Defense"
-        if (name == "Vanguard") name = "Dexterity"
-        if (name == "Negative") name = "Status Effects"
+        if (name == "Full") name = "EOD"
+        if (name == "Negative") name = "Delta"
+        if (name == "Sentinel") name = "Sentinel"
+        if (name == "Vanguard") name = "Vanguard"
 
 
         var bonus = document.createElement('span')
@@ -170,7 +169,8 @@ function bazaar(triggered) {
 }
 
 function armory(triggered) {
-    if (triggered[0].parentElement.parentElement.parentElement.parentElement.id == "armory-weapons") {
+    if (triggered[0].parentElement.parentElement.parentElement.parentElement.id == "armoury-weapons") {
+        console.log("HI")
         var display = triggered[0].parentElement.parentElement.childNodes[9]
         display.textContent = ""
 
@@ -191,11 +191,11 @@ function armory(triggered) {
         var value2 = format(title2, name2)
         text = document.createElement('span')
         text.textContent = "" + value2 + name2
-        text.setAttribute("style", "padding-left: 10px !important;")
+        text.setAttribute("style", "padding-left: 11px !important;")
         display.appendChild(text)
         display.className += " double"
     }
-    else {
+    else if (triggered[0].parentElement.parentElement.parentElement.parentElement.id == "armoury-armour"){
         display = triggered[0].parentElement.parentElement.childNodes[9]
         display.textContent = ""
 
