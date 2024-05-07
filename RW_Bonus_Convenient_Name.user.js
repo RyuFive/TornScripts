@@ -1,19 +1,45 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
-// @author RyuFive
+// @author      RyuFive
 // @match      https://www.torn.com/displaycase.php*
 // @match      https://www.torn.com/amarket.php*
-// @match      https://www.torn.com/bazaar.php?userId=*
+// @match      https://www.torn.com/bazaar.php*
+// @match      https://www.torn.com/factions.php?step=your&type=1*
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      2.1
+// @version      2.5
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
+// @grant        GM_addStyle
 // ==/UserScript==
 
+GM_addStyle(`
+#armoury-weapons{
+.loaned {
+  width: 75px !important;
+}
+.type {
+  width: 133px !important;
+}
+.double {
+  height: 64px !important;
+}
+}
+#armoury-armour{
+.loaned {
+  width: 75px !important;
+}
+.type {
+  width: 133px !important;
+}
+.double {
+  height: 64px !important;
+}
+}
+`)
 
 function amarket()
 {
@@ -143,6 +169,48 @@ function bazaar(triggered) {
     }
 }
 
+function armory(triggered) {
+    if (triggered[0].parentElement.parentElement.parentElement.parentElement.id == "armory-weapons") {
+        var display = triggered[0].parentElement.parentElement.childNodes[9]
+        display.textContent = ""
+
+        var title1 = triggered[0].childNodes[1].title
+        if (title1 == "") return
+        var name1 = title1.split('>')[1].split('<')[0]
+        var value1 = format(title1, name1)
+        var text = document.createElement('span')
+        var br = document.createElement('br')
+        text.textContent = value1 + name1
+        display.appendChild(text)
+        display.appendChild(br)
+
+
+        var title2 = triggered[0].childNodes[3].title
+        if (title2 == "") return
+        var name2 = title2.split('>')[1].split('<')[0]
+        var value2 = format(title2, name2)
+        text = document.createElement('span')
+        text.textContent = "" + value2 + name2
+        text.setAttribute("style", "padding-left: 10px !important;")
+        display.appendChild(text)
+        display.className += " double"
+    }
+    else {
+        display = triggered[0].parentElement.parentElement.childNodes[9]
+        display.textContent = ""
+
+        title1 = triggered[0].childNodes[1].title
+        if (title1 == "") return
+        name1 = title1.split('>')[1].split('<')[0]
+        value1 = format(title1, name1)
+        text = document.createElement('span')
+        br = document.createElement('br')
+        text.textContent = value1 + name1
+        display.appendChild(text)
+        display.appendChild(br)
+    }
+}
+
 function format(title, name) {
     var value = title.split('%')[0].split('>')[3] + "% "
     if (name == 'Irradiate' || name == 'Smash') {
@@ -169,3 +237,4 @@ function format(title, name) {
 waitForKeyElements(".item-cont-wrap ", amarket)
 waitForKeyElements(".display-main-page ", displaycase)
 waitForKeyElements(".iconBonuses____iFjZ", bazaar)
+waitForKeyElements(".bonus",armory)
