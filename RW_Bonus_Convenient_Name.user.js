@@ -5,11 +5,13 @@
 // @match      https://www.torn.com/amarket.php*
 // @match      https://www.torn.com/bazaar.php*
 // @match      https://www.torn.com/factions.php?step*
+// @match      https://www.torn.com/item.php*
+// @match      https://www.torn.com/imarket.php*
 // @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      3.1
+// @version      4.0
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -108,7 +110,6 @@ function displaycase() {
             name = title.split('>')[1].split('<')[0]
             value = format(title, name)
             var bonus2 = document.createElement('span')
-
             bonus2.innerHTML = value + name
             if (darkmode) {
                 bonus2.setAttribute("style", "background-color: #000000b0;")
@@ -134,6 +135,7 @@ function bazaar(triggered) {
         if (name == "Negative") name = "Delta"
         if (name == "Sentinel") name = "Sentinel"
         if (name == "Vanguard") name = "Vanguard"
+        if (name == "Fury") name = "Double Tap"
 
 
         var bonus = document.createElement('span')
@@ -170,9 +172,26 @@ function bazaar(triggered) {
     }
 }
 
+function manage(triggered) {
+    if (triggered && triggered[0]) {
+        var className = triggered[0].className
+        if (className.includes('blank-bonus')) return
+        var name = className.split('-')[2]
+        name = name.charAt(0).toUpperCase() + name.slice(1)
+
+        if (name == "Full") name = "EOD"
+        if (name == "Negative") name = "Delta"
+        if (name == "Sentinel") name = "Sentinel"
+        if (name == "Vanguard") name = "Vanguard"
+        if (name == "Poisoned") name = "Poison"
+
+        triggered[0].parentElement.parentElement.parentElement.childNodes[2].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[2].childNodes[0].innerHTML.split(' x')[0] + " (" + name + ")"
+    }
+}
+
 function armory(triggered) {
     if (triggered[0].parentElement.parentElement.parentElement.parentElement.id == "armoury-weapons") {
-        console.log("HI")
+
         var display = triggered[0].parentElement.parentElement.childNodes[9]
         display.textContent = ""
 
@@ -213,6 +232,116 @@ function armory(triggered) {
     }
 }
 
+function inventoryandbazaar(triggered) {
+    var link = document.URL
+
+    if (link.includes('item')) {
+        if (triggered && triggered[0] && triggered[0].childElementCount >= 3) {
+            var element = triggered[0].childNodes[5].childNodes[1]
+            if (triggered[0].childNodes[5].className.includes('testtest')) element = triggered[0].childNodes[7].childNodes[1]
+            var title = element.title
+            if (title == '') return
+
+            var name = title.split('>')[1].split('<')[0]
+            var value = format(title, name)
+
+            if (name == "Full") name = "EOD"
+            if (name == "Negative") name = "Delta"
+            if (name == "Sentinel") name = "Sentinel"
+            if (name == "Vanguard") name = "Vanguard"
+            if (name == "Poisoned") name = "Poison"
+
+            triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML + " (" + value + " " + name + ")"
+
+            if (!element.parentElement.childNodes[3].className.includes('blank-bonus')) {
+                title = element.parentElement.childNodes[3].title
+                if (title == '') return
+
+                name = title.split('>')[1].split('<')[0]
+                value = format(title, name)
+
+                if (name == "Full") name = "EOD"
+                if (name == "Negative") name = "Delta"
+                if (name == "Sentinel") name = "Sentinel"
+                if (name == "Vanguard") name = "Vanguard"
+                if (name == "Poisoned") name = "Poison"
+
+                triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML.slice(0, -1) + ", " + value + " " + name + ")"
+            }
+        }
+    }
+    else if (link.includes('bazaar.php#/add')) {
+        if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
+            element = triggered[0].childNodes[2].childNodes[0]
+
+            title = element.title
+            if (title == '') return
+
+            name = title.split('>')[1].split('<')[0]
+            value = format(title, name)
+
+            if (name == "Full") name = "EOD"
+            if (name == "Negative") name = "Delta"
+            if (name == "Sentinel") name = "Sentinel"
+            if (name == "Vanguard") name = "Vanguard"
+            if (name == "Poisoned") name = "Poison"
+
+            triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML + " (" + value + " " + name + ")"
+
+            if (!element.parentElement.childNodes[1].className.includes('blank-bonus')) {
+                title = element.parentElement.childNodes[1].title
+                if (title == '') return
+
+                name = title.split('>')[1].split('<')[0]
+                value = format(title, name)
+
+                if (name == "Full") name = "EOD"
+                if (name == "Negative") name = "Delta"
+                if (name == "Sentinel") name = "Sentinel"
+                if (name == "Vanguard") name = "Vanguard"
+                if (name == "Poisoned") name = "Poison"
+
+                triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML.slice(0, -1) + ", " + value + " " + name + ")"
+            }
+        }
+    }
+    else if (link.includes('imarket.php#/p=addl')) {
+        if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
+            element = triggered[0].childNodes[2].childNodes[0]
+
+            title = element.title
+            if (title == '') return
+
+            name = title.split('>')[1].split('<')[0]
+            value = format(title, name)
+
+            if (name == "Full") name = "EOD"
+            if (name == "Negative") name = "Delta"
+            if (name == "Sentinel") name = "Sentinel"
+            if (name == "Vanguard") name = "Vanguard"
+            if (name == "Poisoned") name = "Poison"
+
+            triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML + " (" + value + " " + name + ")"
+
+            if (!element.parentElement.childNodes[1].className.includes('blank-bonus')) {
+                title = element.parentElement.childNodes[1].title
+                if (title == '') return
+
+                name = title.split('>')[1].split('<')[0]
+                value = format(title, name)
+
+                if (name == "Full") name = "EOD"
+                if (name == "Negative") name = "Delta"
+                if (name == "Sentinel") name = "Sentinel"
+                if (name == "Vanguard") name = "Vanguard"
+                if (name == "Poisoned") name = "Poison"
+
+                triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML.slice(0, -1) + ", " + value + " " + name + ")"
+            }
+        }
+    }
+}
+
 function format(title, name) {
     var value = title.split('%')[0].split('>')[3] + "% "
     if (name == 'Irradiate' || name == 'Smash') {
@@ -233,10 +362,15 @@ function format(title, name) {
     else if (name == 'Eviscerate') {
         value = title.split(' extra')[0].split('them ')[1] + " "
     }
+    else if (name == 'Poison') {
+        value = title.split(' chance to Poison')[0].split('</b><br/>')[1] + " "
+    }
     return value
 }
 
 waitForKeyElements(".item-cont-wrap ", amarket)
 waitForKeyElements(".display-main-page ", displaycase)
 waitForKeyElements(".iconBonuses____iFjZ", bazaar)
+waitForKeyElements(".extraBonusIcon___x2WH_ ", manage)
+waitForKeyElements(".bonuses-wrap", inventoryandbazaar)
 waitForKeyElements(".bonus",armory)
