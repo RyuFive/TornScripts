@@ -6,12 +6,11 @@
 // @match      https://www.torn.com/bazaar.php*
 // @match      https://www.torn.com/factions.php?step*
 // @match      https://www.torn.com/item.php*
-// @match      https://www.torn.com/imarket.php*
-// @namespace    https://github.com/RyuFive/TornScripts/raw/main/Auction Names.user.js
-// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
-// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/Auction_Names.user.js
+// @namespace    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
+// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
+// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      4.0
+// @version      4.1
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -305,41 +304,41 @@ function inventoryandbazaar(triggered) {
             }
         }
     }
-    else if (link.includes('imarket.php#/p=addl')) {
-        if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
-            element = triggered[0].childNodes[2].childNodes[0]
+//     else if (link.includes('imarket.php#/p=addl')) {
+//         if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
+//             element = triggered[0].childNodes[2].childNodes[0]
 
-            title = element.title
-            if (title == '') return
+//             title = element.title
+//             if (title == '') return
 
-            name = title.split('>')[1].split('<')[0]
-            value = format(title, name)
+//             name = title.split('>')[1].split('<')[0]
+//             value = format(title, name)
 
-            if (name == "Full") name = "EOD"
-            if (name == "Negative") name = "Delta"
-            if (name == "Sentinel") name = "Sentinel"
-            if (name == "Vanguard") name = "Vanguard"
-            if (name == "Poisoned") name = "Poison"
+//             if (name == "Full") name = "EOD"
+//             if (name == "Negative") name = "Delta"
+//             if (name == "Sentinel") name = "Sentinel"
+//             if (name == "Vanguard") name = "Vanguard"
+//             if (name == "Poisoned") name = "Poison"
 
-            triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML + " (" + value + " " + name + ")"
+//             triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML + " (" + value + " " + name + ")"
 
-            if (!element.parentElement.childNodes[1].className.includes('blank-bonus')) {
-                title = element.parentElement.childNodes[1].title
-                if (title == '') return
+//             if (!element.parentElement.childNodes[1].className.includes('blank-bonus')) {
+//                 title = element.parentElement.childNodes[1].title
+//                 if (title == '') return
 
-                name = title.split('>')[1].split('<')[0]
-                value = format(title, name)
+//                 name = title.split('>')[1].split('<')[0]
+//                 value = format(title, name)
 
-                if (name == "Full") name = "EOD"
-                if (name == "Negative") name = "Delta"
-                if (name == "Sentinel") name = "Sentinel"
-                if (name == "Vanguard") name = "Vanguard"
-                if (name == "Poisoned") name = "Poison"
+//                 if (name == "Full") name = "EOD"
+//                 if (name == "Negative") name = "Delta"
+//                 if (name == "Sentinel") name = "Sentinel"
+//                 if (name == "Vanguard") name = "Vanguard"
+//                 if (name == "Poisoned") name = "Poison"
 
-                triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML.slice(0, -1) + ", " + value + " " + name + ")"
-            }
-        }
-    }
+//                 triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML.slice(0, -1) + ", " + value + " " + name + ")"
+//             }
+//         }
+//     }
 }
 
 function format(title, name) {
