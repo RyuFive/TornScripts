@@ -11,7 +11,7 @@
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      4.2
+// @version      4.3
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -126,18 +126,17 @@ function displaycase() {
 function bazaar(triggered) {
     var darkmode = $("#dark-mode-state")[0].checked // dark or light
 
-    // var items = $(".bonus-attachment-icons").parents("div.iconsbonuses")
     if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
-        var name = triggered[0].childNodes[0].childNodes[0].className.split('-')[2]
-        name = name.charAt(0).toUpperCase() + name.slice(1)
+        var element = triggered[0].childNodes[0].childNodes[0]
 
-        name = trueName(name)
-
+        var name = element.getAttribute("data-bonus-attachment-title")
+        var desc = element.getAttribute("data-bonus-attachment-description")
+        var value = formatNew(desc, name)
 
         var bonus = document.createElement('span')
         var br = document.createElement('br')
 
-        bonus.innerHTML = name
+        bonus.innerHTML = value + name
         if (darkmode) {
             bonus.setAttribute("style", "background-color: #000000b0;")
         }
@@ -148,13 +147,16 @@ function bazaar(triggered) {
         triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top: 3px;display:inline-block !important")
 
         if (triggered[0].childElementCount == 2) {
-            name = triggered[0].childNodes[1].childNodes[0].className.split('-')[2]
-            name = name.charAt(0).toUpperCase() + name.slice(1)
+            element = triggered[0].childNodes[1].childNodes[0]
+
+            name = element.getAttribute("data-bonus-attachment-title")
+            desc = element.getAttribute("data-bonus-attachment-description")
+            value = formatNew(desc, name)
 
             if (name != undefined) {
                 var bonus2 = document.createElement('span')
 
-                bonus2.innerHTML = name
+                bonus2.innerHTML = value + name
                 if (darkmode) {
                     bonus2.setAttribute("style", "background-color: #000000b0;")
                 }
