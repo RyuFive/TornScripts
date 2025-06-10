@@ -11,7 +11,7 @@
 // @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      4.3
+// @version      4.4
 // @description  try to take over the world!
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @license MIT
@@ -382,7 +382,7 @@ function formatNew(desc, name) {
         value = desc.split(' extra')[0].split('them ')[1] + " "
     }
     else if (name == 'Poison') {
-        value = desc.split(' chance to Poison')[0].split('</b><br/>')[1] + " "
+        value = desc.split(' chance to Poison')[0] + " "
     }
     return value
 }
