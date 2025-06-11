@@ -1,174 +1,215 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
-// @author      RyuFive
-// @match      https://www.torn.com/displaycase.php*
-// @match      https://www.torn.com/amarket.php*
-// @match      https://www.torn.com/bazaar.php*
-// @match      https://www.torn.com/factions.php?step*
-// @match      https://www.torn.com/item.php*
-// @match      https://www.torn.com/page.php?sid=ItemMarket*
-// @namespace    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
-// @downloadURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
-// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
-// @require      https://gist.githubusercontent.com/BrockA/2625891/raw/9c97aa67ff9c5d56be34a55ad6c18a314e5eb548/waitForKeyElements.js
-// @version      4.4
-// @description  try to take over the world!
+// @namespace    https://github.com/RyuFive/TornScripts
+// @version      5.0
+// @description  Displays RW bonus values with convenient names across Torn pages.
+// @author       RyuFive
+// @match        https://www.torn.com/displaycase.php*
+// @match        https://www.torn.com/amarket.php*
+// @match        https://www.torn.com/bazaar.php*
+// @match        https://www.torn.com/factions.php?step=*
+// @match        https://www.torn.com/item.php*
+// @match        https://www.torn.com/page.php?sid=ItemMarket*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
-// @license MIT
+// @require      https://gist.githubusercontent.com/BrockA/2625891/raw/waitForKeyElements.js
+// @downloadURL  https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
+// @updateURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @grant        GM_addStyle
+// @license      MIT
 // ==/UserScript==
 
 GM_addStyle(`
-#armoury-weapons{
-.loaned {
+#armoury-weapons .loaned {
   width: 75px !important;
 }
-.type {
+#armoury-weapons .type {
   width: 133px !important;
 }
-.double {
+#armoury-weapons .double {
   height: 40px !important;
   line-height: 20px !important;
 }
-}
-#armoury-armour{
-.loaned {
+#armoury-armour .loaned {
   width: 75px !important;
 }
-.type {
+#armoury-armour .type {
   width: 133px !important;
 }
-.double {
+#armoury-armour .double {
   height: 40px !important;
   line-height: 20px !important;
 }
-}
-`)
+`);
 
-function amarket()
-{
-    $(".t-gray-6").html("")
+// AUCTION HOUSE ========================================================================================================
 
-    var row = $(".bonus-attachment-icons").parents("div.item-cont-wrap")
+function amarket() {
+    $(".t-gray-6").html(""); // Clear previous content
 
-    if (row.length === 0) {
-        return
-    }
+    const rows = $(".bonus-attachment-icons").parents("div.item-cont-wrap");
+    if (rows.length === 0) return;
 
-    for (var i in row) {
-        if (!isIntNumber(i)) continue
-        var title = $(row[i]).find("span.bonus-attachment-icons")[0].title
-        if (title == '') continue
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const container = $(row).find("p.t-gray-6")[0];
+        const icons = $(row).find("span.bonus-attachment-icons");
 
-        var name = title.split('>')[1].split('<')[0]
-        var value = format(title, name)
+        if (!container || icons.length === 0) continue;
 
-        $(row[i]).find("p.t-gray-6")[0].innerHTML = value + name
-        if ($(row[i]).find("span.bonus-attachment-icons")[1] != undefined) {
-            title = $(row[i]).find("span.bonus-attachment-icons")[1].title
-            name = title.split('>')[1].split('<')[0]
-            value = format(title, name)
-            $(row[i]).find("p.t-gray-6")[0].innerHTML += "<br>" + value + name
+        container.innerHTML = "";
+
+        let bonus1 = "", bonus2 = "";
+
+        // First bonus
+        if (icons[0]) {
+            const title1 = icons[0].title;
+            if (title1) {
+                const name1 = title1.split('>')[1]?.split('<')[0];
+                const value1 = format(title1, name1);
+                bonus1 = value1 + name1;
+            }
         }
+
+        // Second bonus
+        if (icons[1]) {
+            const title2 = icons[1].title;
+            if (title2) {
+                const name2 = title2.split('>')[1]?.split('<')[0];
+                const value2 = format(title2, name2);
+                bonus2 = value2 + name2;
+            }
+        }
+
+        // Output: Second bonus first
+        container.innerHTML = bonus2
+            ? (bonus1 ? bonus2 + "<br>" + bonus1 : bonus2)
+            : bonus1;
     }
 }
+
+// AUCTION HOUSE ========================================================================================================
+
+// DISPLAY ========================================================================================================
 
 function displaycase() {
-    var darkmode = $("#dark-mode-state")[0].checked // dark or light
+    const darkmode = document.body.classList.contains("dark-mode");
+    const items = $(".bonus-attachment-icons").parents("div.iconsbonuses");
 
-    var items = $(".bonus-attachment-icons").parents("div.iconsbonuses")
+    if (items.length === 0) return;
 
-    if (items.length === 0) {
-        return
-    }
+    for (let i in items) {
+        if (!isIntNumber(i)) continue;
 
-    for (var i in items) {
-        if (!isIntNumber(i)) continue
-        var title = $(items[i]).find("span.bonus-attachment-icons")[0].title
-        if (title == '') continue
+        const bonusIcons = $(items[i]).find("span.bonus-attachment-icons");
+        if (bonusIcons.length === 0) continue;
 
-        var name = title.split('>')[1].split('<')[0]
-        var value = format(title, name)
+        // Remove all existing custom spans
+        bonusIcons.find("span.custom-bonus").remove();
 
-        var bonus = document.createElement('span')
-        var br = document.createElement('br')
+        const first = bonusIcons[0];
+        if (!first || !first.title) continue;
 
-        bonus.innerHTML = value + name
-        if (darkmode) {
-            bonus.setAttribute("style", "background-color: #000000b0;")
-        }
-        else {
-            bonus.setAttribute("style", "background-color: #ffffffb0;")
-        }
-        $(items[i]).find("span.bonus-attachment-icons")[0].appendChild(bonus)
-        $(items[i]).find("span.bonus-attachment-icons")[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
+        let name1 = first.title.split('>')[1]?.split('<')[0];
+        if (!name1) continue;
 
-        var second = $(items[i]).find("span.bonus-attachment-icons")[1]
-        if (second != undefined) {
-            items[i].insertBefore(br, second)
-            title = second.title
-            name = title.split('>')[1].split('<')[0]
-            value = format(title, name)
-            var bonus2 = document.createElement('span')
-            bonus2.innerHTML = value + name
-            if (darkmode) {
-                bonus2.setAttribute("style", "background-color: #000000b0;")
-            }
-            else {
-                bonus2.setAttribute("style", "background-color: #ffffffb0;")
-            }
-            second.appendChild(bonus2)
-            second.setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
+        let value1 = format(first.title, name1);
+        name1 = trueName(name1);
+
+        const bonus1 = document.createElement('span');
+        bonus1.className = "custom-bonus";
+        bonus1.innerHTML = value1 + name1;
+        bonus1.style.backgroundColor = darkmode ? "#000000b0" : "#ffffffb0";
+        first.appendChild(bonus1);
+        first.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
+
+        const second = bonusIcons[1];
+        if (second && second.title) {
+            let name2 = second.title.split('>')[1]?.split('<')[0];
+            let value2 = format(second.title, name2);
+            name2 = trueName(name2);
+
+            const bonus2 = document.createElement('span');
+            bonus2.className = "custom-bonus";
+            bonus2.innerHTML = value2 + name2;
+            bonus2.style.backgroundColor = darkmode ? "#000000b0" : "#ffffffb0";
+            second.appendChild(bonus2);
+            second.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
         }
     }
 }
+
+function observeDarkModeToggle() {
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (
+                mutation.type === "attributes" &&
+                mutation.attributeName === "class"
+            ) {
+                const hasDark = document.body.classList.contains("dark-mode");
+                displaycase(); // Re-apply correct styles
+            }
+        }
+    });
+
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["class"]
+    });
+}
+
+observeDarkModeToggle();
+
+// DISPLAY ========================================================================================================
+
+// BAZAAR ========================================================================================================
 
 function bazaar(triggered) {
-    var darkmode = $("#dark-mode-state")[0].checked // dark or light
+    if (!triggered || !triggered[0] || triggered[0].childElementCount < 1) return;
 
-    if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
-        var element = triggered[0].childNodes[0].childNodes[0]
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const colorStyle = `background-color: ${isDarkMode ? "#000000b0" : "#ffffffb0"};`;
 
-        var name = element.getAttribute("data-bonus-attachment-title")
-        var desc = element.getAttribute("data-bonus-attachment-description")
-        var value = formatNew(desc, name)
+    const container = triggered[0];
 
-        var bonus = document.createElement('span')
-        var br = document.createElement('br')
+    // Remove previous custom labels if any
+    container.querySelectorAll('.custom-bonus-label').forEach(e => e.remove());
 
-        bonus.innerHTML = value + name
-        if (darkmode) {
-            bonus.setAttribute("style", "background-color: #000000b0;")
-        }
-        else {
-            bonus.setAttribute("style", "background-color: #ffffffb0;")
-        }
-        triggered[0].childNodes[0].appendChild(bonus)
-        triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top: 3px;display:inline-block !important")
+    const appendBonus = (bonusWrapper) => {
+        const element = bonusWrapper?.childNodes?.[0];
+        if (!element) return;
 
-        if (triggered[0].childElementCount == 2) {
-            element = triggered[0].childNodes[1].childNodes[0]
+        const name = element.getAttribute("data-bonus-attachment-title");
+        const desc = element.getAttribute("data-bonus-attachment-description");
+        if (!name || !desc) return;
 
-            name = element.getAttribute("data-bonus-attachment-title")
-            desc = element.getAttribute("data-bonus-attachment-description")
-            value = formatNew(desc, name)
+        const value = formatNew(desc, name);
 
-            if (name != undefined) {
-                var bonus2 = document.createElement('span')
+        const bonus = document.createElement('span');
+        bonus.classList.add('custom-bonus-label');
+        bonus.style = colorStyle;
+        bonus.textContent = `${value}${name}`;
 
-                bonus2.innerHTML = value + name
-                if (darkmode) {
-                    bonus2.setAttribute("style", "background-color: #000000b0;")
-                }
-                else {
-                    bonus2.setAttribute("style", "background-color: #ffffffb0;")
-                }
-                triggered[0].childNodes[1].appendChild(bonus2)
-                triggered[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top:3px;display:inline-block !important")
-            }
-        }
+        bonusWrapper.appendChild(bonus);
+    };
+
+    appendBonus(container.childNodes[0]);
+
+    if (container.childElementCount === 2) {
+        appendBonus(container.childNodes[1]);
     }
+
+    container.style = "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top: 3px;display:inline-block !important";
 }
+
+const observer = new MutationObserver(() => {
+    document.querySelectorAll(".iconBonuses____iFjZ").forEach(el => {
+        bazaar([el]);
+    });
+});
+
+observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: false });
+
+// BAZAAR ========================================================================================================
 
 function manage(triggered) {
     if (triggered && triggered[0]) {
@@ -183,225 +224,291 @@ function manage(triggered) {
     }
 }
 
+// ARMORY ========================================================================================================
+
 function armory(triggered) {
-    if (triggered[0].parentElement.parentElement.parentElement.parentElement.id == "armoury-weapons") {
+    const root = triggered?.[0]?.parentElement?.parentElement?.parentElement?.parentElement;
+    if (!root) return;
 
-        var display = triggered[0].parentElement.parentElement.childNodes[9]
-        display.textContent = ""
+    const isWeapon = root.id === "armoury-weapons";
+    const isArmour = root.id === "armoury-armour";
+    if (!isWeapon && !isArmour) return;
 
-        var title1 = triggered[0].childNodes[1].title
-        if (title1 == "") return
-        var name1 = title1.split('>')[1].split('<')[0]
-        var value1 = format(title1, name1)
-        var text = document.createElement('span')
-        var br = document.createElement('br')
-        text.textContent = value1 + name1
-        display.appendChild(text)
-        display.appendChild(br)
+    const display = triggered[0]?.parentElement?.parentElement?.childNodes?.[9];
+    if (!display) return;
 
+    display.textContent = ""; // Clear previous content
 
-        var title2 = triggered[0].childNodes[3].title
-        if (title2 == "") return
-        var name2 = title2.split('>')[1].split('<')[0]
-        var value2 = format(title2, name2)
-        text = document.createElement('span')
-        text.textContent = "" + value2 + name2
-        text.setAttribute("style", "padding-left: 11px !important;")
-        display.appendChild(text)
-        display.className += " double"
+    const createBonus = (child, pad = false) => {
+        const title = child?.title;
+        if (!title) return null;
+
+        let name = title.split('>')[1]?.split('<')[0];
+        if (!name) return null;
+
+        const value = format(title, name);
+        name = trueName(name);
+
+        const span = document.createElement('span');
+        span.classList.add('custom-bonus-label'); // ✅ Add marker class
+        span.textContent = `${value}${name}`;
+        if (pad) span.style.paddingLeft = "11px";
+        return span;
+    };
+
+    // Primary bonus
+    const bonus1 = createBonus(triggered[0]?.childNodes?.[1]);
+    if (bonus1) {
+        display.appendChild(bonus1);
+        display.appendChild(document.createElement('br'));
     }
-    else if (triggered[0].parentElement.parentElement.parentElement.parentElement.id == "armoury-armour"){
-        display = triggered[0].parentElement.parentElement.childNodes[9]
-        display.textContent = ""
 
-        title1 = triggered[0].childNodes[1].title
-        if (title1 == "") return
-        name1 = title1.split('>')[1].split('<')[0]
-        value1 = format(title1, name1)
-        text = document.createElement('span')
-        br = document.createElement('br')
-        text.textContent = value1 + name1
-        display.appendChild(text)
-        display.appendChild(br)
+    // Secondary bonus (only for weapons)
+    if (isWeapon) {
+        const bonus2 = createBonus(triggered[0]?.childNodes?.[3], true);
+        if (bonus2) {
+            display.appendChild(bonus2);
+            display.classList.add("double");
+        }
     }
 }
 
+// ARMORY ========================================================================================================
+
+// INVENTORY BAZAAR ========================================================================================================
+
 function inventoryandbazaar(triggered) {
-    var link = document.URL
+    const link = document.URL;
+
+    const removePreviousSpans = (container) => {
+        if (container) {
+            container.querySelectorAll(".custom-bonus-label").forEach(span => span.remove());
+        }
+    };
 
     if (link.includes('item')) {
         if (triggered && triggered[0] && triggered[0].childElementCount >= 3) {
-            var element = triggered[0].childNodes[5].childNodes[1]
-            if (triggered[0].childNodes[5].className.includes('testtest')) element = triggered[0].childNodes[7].childNodes[1]
-            var title = element.title
-            if (title == '') return
+            let element = triggered[0].childNodes[5]?.childNodes[1];
+            if (triggered[0].childNodes[5]?.className?.includes('testtest')) {
+                element = triggered[0].childNodes[7]?.childNodes[1];
+            }
 
-            var name = title.split('>')[1].split('<')[0]
-            var value = format(title, name)
+            if (!element || !element.title) return;
 
-            name = trueName(name)
+            let container = triggered[0].parentElement.parentElement.parentElement
+                                .childNodes[3].childNodes[1].childNodes[3].childNodes[3];
+            removePreviousSpans(container);
 
-            triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML + " (" + value + " " + name + ")"
+            let name = element.title.split('>')[1].split('<')[0];
+            let value = format(element.title, name);
+            name = trueName(name);
 
-            if (!element.parentElement.childNodes[3].className.includes('blank-bonus')) {
-                title = element.parentElement.childNodes[3].title
-                if (title == '') return
+            const span1 = document.createElement('span');
+            span1.classList.add("custom-bonus-label");
+            span1.textContent = ` (${value} ${name}`;
+            container.appendChild(span1);
 
-                name = title.split('>')[1].split('<')[0]
-                value = format(title, name)
+            const nextBonus = element.parentElement.childNodes[3];
+            if (nextBonus && !nextBonus.className.includes('blank-bonus') && nextBonus.title) {
+                name = nextBonus.title.split('>')[1].split('<')[0];
+                value = format(nextBonus.title, name);
+                name = trueName(name);
 
-                name = trueName(name)
-
-                triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[3].childNodes[1].childNodes[3].childNodes[3].innerHTML.slice(0, -1) + ", " + value + " " + name + ")"
+                const span2 = document.createElement('span');
+                span2.classList.add("custom-bonus-label");
+                span2.textContent = `, ${value} ${name})`;
+                container.appendChild(span2);
+            } else {
+                span1.textContent += ')';
             }
         }
-    }
-    else if (link.includes('bazaar.php#/add')) {
+
+    } else if (link.includes('bazaar.php#/add')) {
         if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
-            element = triggered[0].childNodes[2].childNodes[0]
+            const element = triggered[0].childNodes[2]?.childNodes[0];
+            if (!element || !element.title) return;
 
-            title = element.title
-            if (title == '') return
+            let container = triggered[0].parentElement.parentElement.parentElement
+                                .childNodes[1].childNodes[1].childNodes[0];
+            removePreviousSpans(container);
 
-            name = title.split('>')[1].split('<')[0]
-            value = format(title, name)
+            let name = element.title.split('>')[1].split('<')[0];
+            let value = format(element.title, name);
+            name = trueName(name);
 
-            name = trueName(name)
+            const span1 = document.createElement('span');
+            span1.classList.add("custom-bonus-label");
+            span1.textContent = ` (${value} ${name}`;
+            container.appendChild(span1);
 
-            triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML + " (" + value + " " + name + ")"
+            const nextBonus = element.parentElement.childNodes[1];
+            if (nextBonus && !nextBonus.className.includes('blank-bonus') && nextBonus.title) {
+                name = nextBonus.title.split('>')[1].split('<')[0];
+                value = format(nextBonus.title, name);
+                name = trueName(name);
 
-            if (!element.parentElement.childNodes[1].className.includes('blank-bonus')) {
-                title = element.parentElement.childNodes[1].title
-                if (title == '') return
-
-                name = title.split('>')[1].split('<')[0]
-                value = format(title, name)
-
-                name = trueName(name)
-
-                triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML = triggered[0].parentElement.parentElement.parentElement.childNodes[1].childNodes[1].childNodes[0].innerHTML.slice(0, -1) + ", " + value + " " + name + ")"
+                const span2 = document.createElement('span');
+                span2.classList.add("custom-bonus-label");
+                span2.textContent = `, ${value} ${name})`;
+                container.appendChild(span2);
+            } else {
+                span1.textContent += ')';
             }
         }
     }
 }
+
+// INVENTORY BAZAAR ========================================================================================================
+
+// ITEM MARKET ========================================================================================================
 
 function newItemMarket(triggered) {
-    var darkmode = $("#dark-mode-state")[0].checked // dark or light
-    var link = document.URL
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    const link = document.URL;
 
-    if (link.includes('ItemMarket')) {
-        if (triggered && triggered[0] && triggered[0].childNodes[0] && triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[1] && triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[1].childElementCount >= 1) {
-            var element = triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[1].childNodes[0]
+    if (!link.includes('ItemMarket') || !triggered?.[0]) return;
 
-            var name = element.getAttribute("data-bonus-attachment-title")
-            var desc = element.getAttribute("data-bonus-attachment-description")
-            var value = formatNew(desc, name)
+    const bonusContainer = triggered[0].childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0];
+    const primary = bonusContainer?.childNodes?.[1]?.childNodes?.[0];
+    if (!primary) return;
 
-            var bonus = document.createElement('span')
-            var br = document.createElement('br')
+    const name1 = primary.getAttribute("data-bonus-attachment-title");
+    const desc1 = primary.getAttribute("data-bonus-attachment-description");
+    const value1 = formatNew(desc1, name1);
 
-            bonus.innerHTML = value + name
-            if (darkmode) {
-                bonus.setAttribute("style", "background-color: #000000b0;")
-            }
-            else {
-                bonus.setAttribute("style", "background-color: #ffffffb0;")
-            }
-            triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[0].appendChild(bonus)
-            triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px")
+    const span1 = document.createElement('span');
+    span1.innerHTML = value1 + name1;
+    span1.classList.add("custom-bonus-label"); // ✅ Marker
+    span1.style.backgroundColor = isDarkMode ? "#000000b0" : "#ffffffb0";
 
-            if (triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[1].childElementCount == 2) {
-                element = triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[1].childNodes[1]
+    const leftColumn = bonusContainer.childNodes?.[0];
+    leftColumn.appendChild(span1);
+    leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
 
-                name = element.getAttribute("data-bonus-attachment-title")
-                desc = element.getAttribute("data-bonus-attachment-description")
-                value = formatNew(desc, name)
+    const secondBonusExists = bonusContainer?.childNodes?.[1]?.childElementCount === 2;
+    if (secondBonusExists) {
+        const secondary = bonusContainer.childNodes[1].childNodes[1];
+        const name2 = secondary.getAttribute("data-bonus-attachment-title");
+        const desc2 = secondary.getAttribute("data-bonus-attachment-description");
+        const value2 = formatNew(desc2, name2);
 
-                if (name != undefined) {
-                    var bonus2 = document.createElement('span')
+        if (name2 !== undefined) {
+            const span2 = document.createElement('span');
+            span2.innerHTML = value2 + name2;
+            span2.classList.add("custom-bonus-label"); // ✅ Marker
+            span2.style.backgroundColor = isDarkMode ? "#000000b0" : "#ffffffb0";
 
-                    bonus2.innerHTML = value + name
-                    if (darkmode) {
-                        bonus2.setAttribute("style", "background-color: #000000b0;")
-                    }
-                    else {
-                        bonus2.setAttribute("style", "background-color: #ffffffb0;")
-                    }
-                    triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[0].appendChild(bonus2)
-                    triggered[0].childNodes[0].childNodes[2].childNodes[0].childNodes[0].setAttribute("style", "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top:3px;display:grid !important")
-                }
-            }
+            leftColumn.appendChild(span2);
+            leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top:3px;display:grid !important";
         }
     }
 }
 
+function rerunNewItemMarket() {
+    document.querySelectorAll(".itemTile___cbw7w").forEach(el => {
+        const bonusArea = el.querySelector(".bonuses-wrap") ||
+                          el.childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0]?.childNodes?.[0];
+        if (bonusArea) {
+            bonusArea.querySelectorAll(".custom-bonus-label").forEach(span => span.remove());
+        }
+
+        newItemMarket([el]);
+    });
+}
+
+const darkModeObserver = new MutationObserver(() => {
+    rerunNewItemMarket();
+});
+
+darkModeObserver.observe(document.body, {
+    attributes: true,
+    attributeFilter: ["class"]
+});
+
+// ITEM MARKET ========================================================================================================
+
+// FORMATTING ========================================================================================================
+
 function format(title, name) {
-    var value = title.split('%')[0].split('>')[3] + "% "
-    if (name == 'Irradiate' || name == 'Smash' || name == 'Dimensiokinesis' || name == 'Oneirokinesis') {
-        value = ''
+    const excludedNames = ['Irradiate', 'Smash', 'Dimensiokinesis', 'Oneirokinesis'];
+    if (excludedNames.includes(name)) return '';
+
+    const specialHandlers = {
+        'Disarm': () => title.split(' turns')[0]?.split('for ')[1] + " T ",
+        'Bloodlust': () => title.split(' of')[0]?.split('by ')[1] + " ",
+        'Execute': () => title.split(' life')[0]?.split('below ')[1] + " ",
+        'Penetrate': () => title.split(' of')[0]?.split('Ignores ')[1] + " ",
+        'Eviscerate': () => title.split(' extra')[0]?.split('them ')[1] + " ",
+        'Poison': () => title.split(' chance to Poison')[0]?.split('</b><br/>')[1] + " "
+    };
+
+    if (specialHandlers[name]) {
+        try {
+            return specialHandlers[name]() || '';
+        } catch (e) {
+            console.warn(`Format error for "${name}":`, e);
+            return '';
+        }
     }
-    else if (name == 'Disarm') {
-        value = title.split(' turns')[0].split('for ')[1] + " T "
+
+    // Default fallback (tries to extract % value from HTML-ish string)
+    try {
+        const raw = title.split('>')[3]?.split('%')[0];
+        return raw ? raw + '% ' : '';
+    } catch (e) {
+        console.warn('Default format parsing failed:', e);
+        return '';
     }
-    else if (name == 'Bloodlust') {
-        value = title.split(' of')[0].split('by ')[1] + " "
-    }
-    else if (name == 'Execute') {
-        value = title.split(' life')[0].split('below ')[1] + " "
-    }
-    else if (name == 'Penetrate') {
-        value = title.split(' of')[0].split('Ignores ')[1] + " "
-    }
-    else if (name == 'Eviscerate') {
-        value = title.split(' extra')[0].split('them ')[1] + " "
-    }
-    else if (name == 'Poison') {
-        value = title.split(' chance to Poison')[0].split('</b><br/>')[1] + " "
-    }
-    return value
 }
 
 function formatNew(desc, name) {
-    var value = desc.split('%')[0] + "% "
-    if (name == 'Irradiate' || name == 'Smash' || name == 'Dimensiokinesis' || name == 'Oneirokinesis') {
-        value = ''
+    const specialHandlers = {
+        'Disarm': () => desc.split(' turns')[0]?.split('for ')[1] + " T ",
+        'Bloodlust': () => desc.split(' of')[0]?.split('by ')[1] + " ",
+        'Execute': () => desc.split(' life')[0]?.split('below ')[1] + " ",
+        'Penetrate': () => desc.split(' of')[0]?.split('Ignores ')[1] + " ",
+        'Eviscerate': () => desc.split(' extra')[0]?.split('them ')[1] + " ",
+        'Poison': () => desc.split(' chance to Poison')[0] + " ",
+    };
+
+    const excludedNames = ['Irradiate', 'Smash', 'Dimensiokinesis', 'Oneirokinesis'];
+
+    if (excludedNames.includes(name)) return '';
+
+    if (specialHandlers[name]) {
+        try {
+            return specialHandlers[name]() || '';
+        } catch (e) {
+            console.warn(`Failed to format "${name}": ${e}`);
+            return '';
+        }
     }
-    else if (name == 'Disarm') {
-        value = desc.split(' turns')[0].split('for ')[1] + " T "
-    }
-    else if (name == 'Bloodlust') {
-        value = desc.split(' of')[0].split('by ')[1] + " "
-    }
-    else if (name == 'Execute') {
-        value = desc.split(' life')[0].split('below ')[1] + " "
-    }
-    else if (name == 'Penetrate') {
-        value = desc.split(' of')[0].split('Ignores ')[1] + " "
-    }
-    else if (name == 'Eviscerate') {
-        value = desc.split(' extra')[0].split('them ')[1] + " "
-    }
-    else if (name == 'Poison') {
-        value = desc.split(' chance to Poison')[0] + " "
-    }
-    return value
+
+    return desc.split('%')[0] + "% ";
 }
 
 function trueName(text) {
+    const map = {
+        "Full": "EOD",
+        "Negative": "Delta",
+        "Poisoned": "Poison"
+    };
 
-    if (text == "Full") text = "EOD"
-    if (text == "Negative") text = "Delta"
-    if (text == "Sentinel") text = "Sentinel"
-    if (text == "Vanguard") text = "Vanguard"
-    if (text == "Poisoned") text = "Poison"
-    return text
+    return map[text] || text;
 }
 
-waitForKeyElements(".item-cont-wrap ", amarket)
-waitForKeyElements(".display-main-page ", displaycase)
-waitForKeyElements(".iconBonuses____iFjZ", bazaar)
-waitForKeyElements(".extraBonusIcon___x2WH_ ", manage)
-waitForKeyElements(".bonuses-wrap", inventoryandbazaar)
-waitForKeyElements(".bonus",armory)
-waitForKeyElements(".itemTile___cbw7w",newItemMarket)
+// FORMATTING ========================================================================================================
 
+const observerMap = {
+    ".item-cont-wrap": amarket,
+    ".display-main-page": displaycase,
+    ".iconBonuses____iFjZ": bazaar,
+    ".extraBonusIcon___x2WH_": manage,
+    ".bonuses-wrap": inventoryandbazaar,
+    ".bonus": armory,
+    ".itemTile___cbw7w": newItemMarket
+};
+
+for (const [selector, callback] of Object.entries(observerMap)) {
+    waitForKeyElements(selector, callback);
+}
