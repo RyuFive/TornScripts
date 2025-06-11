@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.0
+// @version      5.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -17,6 +17,62 @@
 // @grant        GM_addStyle
 // @license      MIT
 // ==/UserScript==
+
+GM_addStyle(`
+.custom-left-column {
+  float:left;
+  margin-top: 15px;
+  white-space: nowrap;
+  padding-left: 0;
+  top:-40px;
+}
+.custom-left-column-two {
+  float:left;
+  white-space: nowrap;
+  padding-left: 5px;
+  top:3px;
+  display:grid !important
+}
+.custom-bonus-container {
+  float: left;
+  white-space: nowrap;
+  margin-top: 9px;
+  padding-left: 5;
+  top: 3px;
+  right: 0px;
+  display: inline-block !important;
+  position: relative;
+}
+.bonus-attachment-icons {
+  float: left !important;
+  white-space: nowrap !important;
+  padding-left: 0px !important;
+  position: relative !important; /* needed if you use absolute children */
+  top: -40px !important;
+  right: 0px !important;
+}
+.custom-bonus-label {
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 2px;
+  display: inline-block;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  pointer-events: none;
+  user-select: none;
+}
+.custom-bonus-label.dark-mode {
+  background: linear-gradient(145deg, rgba(51, 51, 51, 0.7), rgba(17, 17, 17, 0.7)) !important;
+  color: white !important;
+}
+.custom-bonus-label.light-mode {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(200, 200, 200, 0.7)) !important;
+  color: black !important;
+}
+
+`);
+
 
 GM_addStyle(`
 #armoury-weapons .loaned {
@@ -92,9 +148,7 @@ function amarket() {
 // DISPLAY ========================================================================================================
 
 function displaycase() {
-    const darkmode = document.body.classList.contains("dark-mode");
     const items = $(".bonus-attachment-icons").parents("div.iconsbonuses");
-
     if (items.length === 0) return;
 
     for (let i in items) {
@@ -104,7 +158,7 @@ function displaycase() {
         if (bonusIcons.length === 0) continue;
 
         // Remove all existing custom spans
-        bonusIcons.find("span.custom-bonus").remove();
+        bonusIcons.find("span.custom-bonus-label").remove();
 
         const first = bonusIcons[0];
         if (!first || !first.title) continue;
@@ -116,11 +170,9 @@ function displaycase() {
         name1 = trueName(name1);
 
         const bonus1 = document.createElement('span');
-        bonus1.className = "custom-bonus";
+        bonus1.className = `custom-bonus-label ${document.body.classList.contains("dark-mode") ? "dark-mode" : "light-mode"}`;
         bonus1.innerHTML = value1 + name1;
-        bonus1.style.backgroundColor = darkmode ? "#000000b0" : "#ffffffb0";
         first.appendChild(bonus1);
-        first.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
 
         const second = bonusIcons[1];
         if (second && second.title) {
@@ -129,14 +181,13 @@ function displaycase() {
             name2 = trueName(name2);
 
             const bonus2 = document.createElement('span');
-            bonus2.className = "custom-bonus";
+            bonus2.className = `custom-bonus-label ${document.body.classList.contains("dark-mode") ? "dark-mode" : "light-mode"}`;
             bonus2.innerHTML = value2 + name2;
-            bonus2.style.backgroundColor = darkmode ? "#000000b0" : "#ffffffb0";
             second.appendChild(bonus2);
-            second.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
         }
     }
 }
+
 
 function observeDarkModeToggle() {
     const observer = new MutationObserver((mutations) => {
@@ -167,7 +218,7 @@ function bazaar(triggered) {
     if (!triggered || !triggered[0] || triggered[0].childElementCount < 1) return;
 
     const isDarkMode = document.body.classList.contains('dark-mode');
-    const colorStyle = `background-color: ${isDarkMode ? "#000000b0" : "#ffffffb0"};`;
+    const modeClass = isDarkMode ? "dark-mode" : "light-mode";
 
     const container = triggered[0];
 
@@ -185,8 +236,7 @@ function bazaar(triggered) {
         const value = formatNew(desc, name);
 
         const bonus = document.createElement('span');
-        bonus.classList.add('custom-bonus-label');
-        bonus.style = colorStyle;
+        bonus.className = `custom-bonus-label ${modeClass}`;
         bonus.textContent = `${value}${name}`;
 
         bonusWrapper.appendChild(bonus);
@@ -198,8 +248,9 @@ function bazaar(triggered) {
         appendBonus(container.childNodes[1]);
     }
 
-    container.style = "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top: 3px;display:inline-block !important";
+    container.classList.add("custom-bonus-container");
 }
+
 
 const observer = new MutationObserver(() => {
     document.querySelectorAll(".iconBonuses____iFjZ").forEach(el => {
@@ -363,10 +414,12 @@ function inventoryandbazaar(triggered) {
 // ITEM MARKET ========================================================================================================
 
 function newItemMarket(triggered) {
-    const isDarkMode = document.body.classList.contains("dark-mode");
-    const link = document.URL;
+    if (!triggered?.[0]) return;
+    if (!document.URL.includes('ItemMarket')) return;
 
-    if (!link.includes('ItemMarket') || !triggered?.[0]) return;
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    const modeClass = isDarkMode ? "dark-mode" : "light-mode";
+
 
     const bonusContainer = triggered[0].childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0];
     const primary = bonusContainer?.childNodes?.[1]?.childNodes?.[0];
@@ -377,12 +430,12 @@ function newItemMarket(triggered) {
     const value1 = formatNew(desc1, name1);
 
     const span1 = document.createElement('span');
-    span1.innerHTML = value1 + name1;
-    span1.classList.add("custom-bonus-label"); // ✅ Marker
-    span1.style.backgroundColor = isDarkMode ? "#000000b0" : "#ffffffb0";
+    span1.textContent = value1 + name1;
+    span1.className = `custom-bonus-label ${modeClass}`;
 
     const leftColumn = bonusContainer.childNodes?.[0];
     leftColumn.appendChild(span1);
+    leftColumn.classList.add("custom-left-column");
     leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
 
     const secondBonusExists = bonusContainer?.childNodes?.[1]?.childElementCount === 2;
@@ -392,15 +445,12 @@ function newItemMarket(triggered) {
         const desc2 = secondary.getAttribute("data-bonus-attachment-description");
         const value2 = formatNew(desc2, name2);
 
-        if (name2 !== undefined) {
-            const span2 = document.createElement('span');
-            span2.innerHTML = value2 + name2;
-            span2.classList.add("custom-bonus-label"); // ✅ Marker
-            span2.style.backgroundColor = isDarkMode ? "#000000b0" : "#ffffffb0";
+        const span2 = document.createElement('span');
+        span2.textContent = value2 + name2;
+        span2.className = `custom-bonus-label ${modeClass}`;
 
-            leftColumn.appendChild(span2);
-            leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 5px;top:3px;display:grid !important";
-        }
+        leftColumn.appendChild(span2);
+        leftColumn.classList.add("custom-left-column-two");
     }
 }
 
