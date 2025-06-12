@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.1
+// @version      5.3
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -11,7 +11,6 @@
 // @match        https://www.torn.com/item.php*
 // @match        https://www.torn.com/page.php?sid=ItemMarket*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
-// @require      https://gist.githubusercontent.com/BrockA/2625891/raw/waitForKeyElements.js
 // @downloadURL  https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @grant        GM_addStyle
@@ -549,15 +548,32 @@ function trueName(text) {
 // FORMATTING ========================================================================================================
 
 const observerMap = {
-    ".item-cont-wrap": amarket,
-    ".display-main-page": displaycase,
-    ".iconBonuses____iFjZ": bazaar,
-    ".extraBonusIcon___x2WH_": manage,
-    ".bonuses-wrap": inventoryandbazaar,
-    ".bonus": armory,
-    ".itemTile___cbw7w": newItemMarket
+  ".item-cont-wrap": amarket,
+  ".display-main-page": displaycase,
+  ".iconBonuses____iFjZ": bazaar,
+  ".extraBonusIcon___x2WH_": manage,
+  ".bonuses-wrap": inventoryandbazaar,
+  ".bonus": armory,
+  ".itemTile___cbw7w": newItemMarket
 };
 
-for (const [selector, callback] of Object.entries(observerMap)) {
-    waitForKeyElements(selector, callback);
-}
+const seenElements = new WeakSet();
+
+const process = () => {
+  for (const [selector, callback] of Object.entries(observerMap)) {
+    document.querySelectorAll(selector).forEach(el => {
+      if (!seenElements.has(el)) {
+        seenElements.add(el);
+        callback([el]); // ⬅️ wrap element in array for compatibility
+      }
+    });
+  }
+};
+
+
+// Observe DOM changes
+const mainObserver = new MutationObserver(process);
+mainObserver.observe(document.body, { childList: true, subtree: true });
+
+// Initial check
+process();
