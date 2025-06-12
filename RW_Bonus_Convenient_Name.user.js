@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.3
+// @version      5.4
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -13,87 +13,85 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=torn.com
 // @downloadURL  https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
 // @updateURL    https://github.com/RyuFive/TornScripts/raw/main/RW_Bonus_Convenient_Name.user.js
-// @grant        GM_addStyle
 // @license      MIT
 // ==/UserScript==
 
-GM_addStyle(`
-.custom-left-column {
-  float:left;
-  margin-top: 15px;
-  white-space: nowrap;
-  padding-left: 0;
-  top:-40px;
-}
-.custom-left-column-two {
-  float:left;
-  white-space: nowrap;
-  padding-left: 5px;
-  top:3px;
-  display:grid !important
-}
-.custom-bonus-container {
-  float: left;
-  white-space: nowrap;
-  margin-top: 9px;
-  padding-left: 5;
-  top: 3px;
-  right: 0px;
-  display: inline-block !important;
-  position: relative;
-}
-.bonus-attachment-icons {
-  float: left !important;
-  white-space: nowrap !important;
-  padding-left: 0px !important;
-  position: relative !important; /* needed if you use absolute children */
-  top: -40px !important;
-  right: 0px !important;
-}
-.custom-bonus-label {
-  font-size: 10px;
-  padding: 1px 4px;
-  border-radius: 3px;
-  margin-left: 2px;
-  display: inline-block;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
-  pointer-events: none;
-  user-select: none;
-}
-.custom-bonus-label.dark-mode {
-  background: linear-gradient(145deg, rgba(51, 51, 51, 0.7), rgba(17, 17, 17, 0.7)) !important;
-  color: white !important;
-}
-.custom-bonus-label.light-mode {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(230, 230, 230, 1)) !important;
-  color: black !important;
-}
-
-`);
-
-
-GM_addStyle(`
-#armoury-weapons .loaned {
-  width: 75px !important;
-}
-#armoury-weapons .type {
-  width: 133px !important;
-}
-#armoury-weapons .double {
-  height: 40px !important;
-  line-height: 20px !important;
-}
-#armoury-armour .loaned {
-  width: 75px !important;
-}
-#armoury-armour .type {
-  width: 133px !important;
-}
-#armoury-armour .double {
-  height: 40px !important;
-  line-height: 20px !important;
-}
-`);
+(function addCustomStyles() {
+  const css = `
+    .custom-left-column {
+      float:left;
+      margin-top: 15px;
+      white-space: nowrap;
+      padding-left: 0;
+      top:-40px;
+    }
+    .custom-left-column-two {
+      float:left;
+      white-space: nowrap;
+      vpadding-left: 5px;
+      top:3px;
+      vdisplay:grid !important
+    }
+    .custom-bonus-container {
+      float: left;
+      white-space: nowrap;
+      margin-top: 9px;
+      vpadding-left: 5;
+      vtop: 3px;
+      vright: 0px;
+      display: inline-block !important;
+      position: relative;
+    }
+    .bonus-attachment-icons {
+      float: left !important;
+      white-space: nowrap !important;
+      padding-left: 0px !important;
+      position: relative !important; /* needed if you use absolute children */
+      top: -40px !important;
+      right: 0px !important;
+    }
+    .custom-bonus-label {
+      font-size: 10px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-left: 2px;
+      display: inline-block;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+      pointer-events: none;
+      user-select: none;
+    }
+    .custom-bonus-label.dark-mode {
+      background: linear-gradient(145deg, rgba(51, 51, 51, 0.7), rgba(17, 17, 17, 0.7)) !important;
+      color: white !important;
+    }
+    .custom-bonus-label.light-mode {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(230, 230, 230, 1)) !important;
+      color: black !important;
+    }
+    #armoury-weapons .loaned {
+      width: 75px !important;
+    }
+    #armoury-weapons .type {
+      width: 133px !important;
+    }
+    #armoury-weapons .double {
+      height: 40px !important;
+      line-height: 20px !important;
+    }
+    #armoury-armour .loaned {
+      width: 75px !important;
+    }
+    #armoury-armour .type {
+      vwidth: 133px !important;
+    }
+    #armoury-armour .double {
+      height: 40px !important;
+      line-height: 20px !important;
+    }`;
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+})();
 
 // AUCTION HOUSE ========================================================================================================
 
