@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.4
+// @version      5.5
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -416,10 +416,15 @@ function newItemMarket(triggered) {
     const isDarkMode = document.body.classList.contains("dark-mode");
     const modeClass = isDarkMode ? "dark-mode" : "light-mode";
 
-
     const bonusContainer = triggered[0].childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0];
     const primary = bonusContainer?.childNodes?.[1]?.childNodes?.[0];
     if (!primary) return;
+
+    const leftColumn = bonusContainer.childNodes?.[0];
+    if (!leftColumn) return;
+
+    // 🔹 Remove old spans before adding new ones
+    leftColumn.querySelectorAll(".custom-bonus-label").forEach(el => el.remove());
 
     const name1 = primary.getAttribute("data-bonus-attachment-title");
     const desc1 = primary.getAttribute("data-bonus-attachment-description");
@@ -428,9 +433,8 @@ function newItemMarket(triggered) {
     const span1 = document.createElement('span');
     span1.textContent = value1 + name1;
     span1.className = `custom-bonus-label ${modeClass}`;
-
-    const leftColumn = bonusContainer.childNodes?.[0];
     leftColumn.appendChild(span1);
+
     leftColumn.classList.add("custom-left-column");
     leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
 
@@ -444,11 +448,12 @@ function newItemMarket(triggered) {
         const span2 = document.createElement('span');
         span2.textContent = value2 + name2;
         span2.className = `custom-bonus-label ${modeClass}`;
-
         leftColumn.appendChild(span2);
+
         leftColumn.classList.add("custom-left-column-two");
     }
 }
+
 
 function rerunNewItemMarket() {
     document.querySelectorAll(".itemTile___cbw7w").forEach(el => {
@@ -456,14 +461,16 @@ function rerunNewItemMarket() {
                           el.childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0]?.childNodes?.[0];
         if (bonusArea) {
             bonusArea.querySelectorAll(".custom-bonus-label").forEach(span => span.remove());
+            newItemMarket([el]);
         }
 
-        newItemMarket([el]);
     });
 }
 
+let darkModeTimer;
 const darkModeObserver = new MutationObserver(() => {
-    rerunNewItemMarket();
+    clearTimeout(darkModeTimer);
+    darkModeTimer = setTimeout(rerunNewItemMarket, 50); // slight debounce
 });
 
 darkModeObserver.observe(document.body, {
