@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.6
+// @version      5.7
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -30,9 +30,9 @@
       float: left;
       white-space: nowrap;
       margin-top: 9px;
-      vpadding-left: 5;
-      vtop: 3px;
-      vright: 0px;
+      padding-left: 5;
+      top: 3px;
+      right: 0px;
       display: inline-block !important;
       position: relative;
     }
@@ -66,6 +66,21 @@
       background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(230, 230, 230, 1)) !important;
       color: black !important;
     }
+    .item-cont-wrap.glow-yellow-style {
+      background-color: rgba(255, 255, 0, 0.2);
+      border: 1px solid gold !important;
+      border-radius: 6px;
+    }
+    .item-cont-wrap.glow-orange-style {
+      background-color: rgba(255, 140, 0, 0.2);
+      border: 1px solid darkorange !important;
+      border-radius: 6px;
+    }
+    .item-cont-wrap.glow-red-style {
+      background-color: rgba(255, 60, 60, 0.2);
+      border: 1px solid crimson !important;
+      border-radius: 6px;
+    }
     #armoury-weapons .loaned {
       width: 75px !important;
     }
@@ -80,7 +95,7 @@
       width: 75px !important;
     }
     #armoury-armour .type {
-      vwidth: 133px !important;
+      width: 133px !important;
     }
     #armoury-armour .double {
       height: 40px !important;
@@ -134,8 +149,23 @@ function amarket() {
         container.innerHTML = bonus2
             ? (bonus1 ? bonus2 + "<br>" + bonus1 : bonus2)
             : bonus1;
+
+        // === Set background color and border based on glow class ===
+        const glow = row.querySelector(".item-plate");
+
+        row.classList.remove("glow-yellow-style", "glow-orange-style", "glow-red-style");
+
+        if (glow?.classList.contains("glow-yellow")) {
+            row.classList.add("glow-yellow-style");
+        } else if (glow?.classList.contains("glow-orange")) {
+            row.classList.add("glow-orange-style");
+        } else if (glow?.classList.contains("glow-red")) {
+            row.classList.add("glow-red-style");
+        }
+
     }
 }
+
 
 // AUCTION HOUSE ========================================================================================================
 
