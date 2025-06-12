@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.5
+// @version      5.6
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -16,23 +16,17 @@
 // @license      MIT
 // ==/UserScript==
 
+    // leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
 (function addCustomStyles() {
   const css = `
-    .custom-left-column {
-      float:left;
+    .custom-itemmarket-container {
+      display: flex !important;
+      flex-direction: column;
       margin-top: 15px;
-      white-space: nowrap;
+      white-space: normal;
       padding-left: 0;
-      top:-40px;
     }
-    .custom-left-column-two {
-      float:left;
-      white-space: nowrap;
-      vpadding-left: 5px;
-      top:3px;
-      vdisplay:grid !important
-    }
-    .custom-bonus-container {
+    .custom-bazaar-container {
       float: left;
       white-space: nowrap;
       margin-top: 9px;
@@ -43,6 +37,7 @@
       position: relative;
     }
     .bonus-attachment-icons {
+      width: auto !important;
       float: left !important;
       white-space: nowrap !important;
       padding-left: 0px !important;
@@ -55,10 +50,13 @@
       padding: 1px 4px;
       border-radius: 3px;
       margin-left: 2px;
+      margin-bottom: 2px;
       display: inline-block;
       text-shadow: 0 1px 1px rgba(0,0,0,0.3);
       pointer-events: none;
       user-select: none;
+      white-space: nowrap;       /* ✅ prevents wrapping */
+      max-width: 100%;
     }
     .custom-bonus-label.dark-mode {
       background: linear-gradient(145deg, rgba(51, 51, 51, 0.7), rgba(17, 17, 17, 0.7)) !important;
@@ -244,7 +242,7 @@ function bazaar(triggered) {
         appendBonus(container.childNodes[1]);
     }
 
-    container.classList.add("custom-bonus-container");
+    container.classList.add("custom-bazaar-container");
 }
 
 
@@ -435,8 +433,7 @@ function newItemMarket(triggered) {
     span1.className = `custom-bonus-label ${modeClass}`;
     leftColumn.appendChild(span1);
 
-    leftColumn.classList.add("custom-left-column");
-    leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
+    leftColumn.classList.add("custom-itemmarket-container");
 
     const secondBonusExists = bonusContainer?.childNodes?.[1]?.childElementCount === 2;
     if (secondBonusExists) {
@@ -449,8 +446,6 @@ function newItemMarket(triggered) {
         span2.textContent = value2 + name2;
         span2.className = `custom-bonus-label ${modeClass}`;
         leftColumn.appendChild(span2);
-
-        leftColumn.classList.add("custom-left-column-two");
     }
 }
 
