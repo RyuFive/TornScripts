@@ -66,7 +66,7 @@ GM_addStyle(`
   color: white !important;
 }
 .custom-bonus-label.light-mode {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(200, 200, 200, 0.7)) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(230, 230, 230, 1)) !important;
   color: black !important;
 }
 
