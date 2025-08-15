@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.7
+// @version      5.8
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -105,6 +105,11 @@
     style.textContent = css;
     document.head.appendChild(style);
 })();
+
+function isMobile() {
+    const menuDiv = document.querySelector('.header-menu.left.leftMenu___md3Ch');
+    return menuDiv ? menuDiv.classList.contains('dropdown-menu') : false;
+}
 
 // AUCTION HOUSE ========================================================================================================
 
@@ -302,49 +307,93 @@ function manage(triggered) {
 // ARMORY ========================================================================================================
 
 function armory(triggered) {
-    const root = triggered?.[0]?.parentElement?.parentElement?.parentElement?.parentElement;
-    if (!root) return;
+    if (isMobile()) {
+        // MOBILE LOGIC
+        const root = triggered?.[0]
+        if (!root) return
 
-    const isWeapon = root.id === "armoury-weapons";
-    const isArmour = root.id === "armoury-armour";
-    if (!isWeapon && !isArmour) return;
+        // Traverse up to the main armoury section
+        const armouryRoot = root.closest("#armoury-weapons, #armoury-armour")
+        if (!armouryRoot) return
 
-    const display = triggered[0]?.parentElement?.parentElement?.childNodes?.[9];
-    if (!display) return;
+        const isWeapon = armouryRoot.id === "armoury-weapons"
 
-    display.textContent = ""; // Clear previous content
+        // Locate the display element (child index 9 from the grandparent)
+        const display = root.parentElement?.parentElement?.childNodes?.[3]
+        if (!display) return
 
-    const createBonus = (child, pad = false) => {
-        const title = child?.title;
-        if (!title) return null;
+        // Locate the display element (child index 9 from the grandparent)
+        const createBonusText = (child) => {
+            const title = child?.title
+            if (!title) return null
 
-        let name = title.split('>')[1]?.split('<')[0];
-        if (!name) return null;
+            const nameMatch = title.match(/>([^<]+)</)
+            if (!nameMatch) return null
 
-        const value = format(title, name);
-        name = trueName(name);
+            const rawName = nameMatch[1].trim()
+            const value = format(title, rawName)
+            return `${value}${trueName(rawName)}`
+        };
 
-        const span = document.createElement('span');
-        span.classList.add('custom-bonus-label'); // ✅ Add marker class
-        span.textContent = `${value}${name}`;
-        if (pad) span.style.paddingLeft = "11px";
-        return span;
-    };
+        // Build bonuses
+        const bonuses = [
+            createBonusText(root.childNodes?.[1]),
+            isWeapon && createBonusText(root.childNodes?.[3])
+        ].filter(Boolean)
 
-    // Primary bonus
-    const bonus1 = createBonus(triggered[0]?.childNodes?.[1]);
-    if (bonus1) {
-        display.appendChild(bonus1);
-        display.appendChild(document.createElement('br'));
-    }
-
-    // Secondary bonus (only for weapons)
-    if (isWeapon) {
-        const bonus2 = createBonus(triggered[0]?.childNodes?.[3], true);
-        if (bonus2) {
-            display.appendChild(bonus2);
-            display.classList.add("double");
+        // Set formatted text
+        if (bonuses.length) {
+            display.textContent += ` (${bonuses.join(" - ")})`
         }
+        display.title = display.textContent
+    }
+    else {
+        // PC LOGIC
+        const root = triggered?.[0]
+        if (!root) return
+
+        // Traverse up to the main armoury section
+        const armouryRoot = root.closest("#armoury-weapons, #armoury-armour")
+        if (!armouryRoot) return
+
+        const isWeapon = armouryRoot.id === "armoury-weapons"
+
+        // Locate the display element (child index 9 from the grandparent)
+        const display = root.parentElement?.parentElement?.childNodes?.[9]
+        if (!display) return
+
+        display.textContent = ""; // Clear old content
+
+        const createBonus = (child, pad = false) => {
+            const title = child?.title
+            if (!title) return null
+
+            let name = title.split(">")[1]?.split("<")[0]
+            if (!name) return null
+
+            const value = format(title, name)
+            name = trueName(name)
+
+            const span = document.createElement("span")
+            span.className = "custom-bonus-label" // marker class
+            span.textContent = `${value}${name}`
+            if (pad) span.style.paddingLeft = "11px"
+            return span
+        };
+
+        // Append bonuses
+        const bonuses = [
+            createBonus(root.childNodes?.[1]),
+            isWeapon && createBonus(root.childNodes?.[3], true)
+        ].filter(Boolean)
+
+        bonuses.forEach((bonus, i) => {
+            display.appendChild(bonus)
+            if (i === 0 && bonuses.length > 1) {
+                display.appendChild(document.createElement("br"))
+                display.classList.add("double")
+            }
+        })
     }
 }
 
@@ -353,81 +402,102 @@ function armory(triggered) {
 // INVENTORY BAZAAR ========================================================================================================
 
 function inventoryandbazaar(triggered) {
-    const link = document.URL;
+    const link = document.URL
 
     const removePreviousSpans = (container) => {
         if (container) {
-            container.querySelectorAll(".custom-bonus-label").forEach(span => span.remove());
+            container.querySelectorAll(".custom-bonus-label").forEach(span => span.remove())
         }
-    };
+    }
 
     if (link.includes('item')) {
-        if (triggered && triggered[0] && triggered[0].childElementCount >= 3) {
-            let element = triggered[0].childNodes[5]?.childNodes[1];
-            if (triggered[0].childNodes[5]?.className?.includes('testtest')) {
-                element = triggered[0].childNodes[7]?.childNodes[1];
+
+        if (triggered?.[0]?.childElementCount >= 3) {
+            const row = triggered[0];
+            const bonusParentIndex = row.childNodes[5]?.className?.includes('testtest') ? 7 : 5;
+            const element = row.childNodes[bonusParentIndex]?.childNodes?.[1];
+
+            if (!element?.title) return;
+
+            // Locate container once
+            var container = row.parentElement
+            ?.parentElement
+            ?.parentElement
+            ?.childNodes?.[3]
+            ?.childNodes?.[1]
+            ?.childNodes?.[3]
+            ?.childNodes?.[3]
+
+            if(isMobile()) {
+                container = row.parentElement
+                ?.parentElement
+                ?.parentElement
+                ?.childNodes?.[3]
+                ?.childNodes?.[3]
+                ?.childNodes?.[3]
+                ?.childNodes?.[3]
             }
 
-            if (!element || !element.title) return;
+            if (!container) return;
 
-            let container = triggered[0].parentElement.parentElement.parentElement
-                                .childNodes[3].childNodes[1].childNodes[3].childNodes[3];
             removePreviousSpans(container);
 
-            let name = element.title.split('>')[1].split('<')[0];
-            let value = format(element.title, name);
-            name = trueName(name);
+            const parseBonus = (el) => {
+                if (!el?.title) return null;
+                const match = el.title.match(/>([^<]+)</);
+                if (!match) return null;
+                const rawName = match[1].trim();
+                return `${format(el.title, rawName)} ${trueName(rawName)}`;
+            };
 
-            const span1 = document.createElement('span');
-            span1.classList.add("custom-bonus-label");
-            span1.textContent = ` (${value} ${name}`;
-            container.appendChild(span1);
+            // Primary bonus
+            const bonuses = [parseBonus(element)];
 
-            const nextBonus = element.parentElement.childNodes[3];
-            if (nextBonus && !nextBonus.className.includes('blank-bonus') && nextBonus.title) {
-                name = nextBonus.title.split('>')[1].split('<')[0];
-                value = format(nextBonus.title, name);
-                name = trueName(name);
+            // Secondary bonus
+            const nextBonus = element.parentElement?.childNodes?.[3];
+            if (nextBonus && !nextBonus.className?.includes('blank-bonus')) {
+                const parsed = parseBonus(nextBonus);
+                if (parsed) bonuses.push(parsed);
+            }
 
-                const span2 = document.createElement('span');
-                span2.classList.add("custom-bonus-label");
-                span2.textContent = `, ${value} ${name})`;
-                container.appendChild(span2);
-            } else {
-                span1.textContent += ')';
+            // Build and append single span
+            if (bonuses[0]) {
+                const span = document.createElement('span');
+                span.className = "custom-bonus-label";
+                span.textContent = ` (${bonuses.join(', ')})`;
+                container.appendChild(span);
             }
         }
-
     } else if (link.includes('bazaar.php#/add')) {
         if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
-            const element = triggered[0].childNodes[2]?.childNodes[0];
-            if (!element || !element.title) return;
+            const element = triggered[0].childNodes[2]?.childNodes[0]
+            if (!element || !element.title) return
 
             let container = triggered[0].parentElement.parentElement.parentElement
-                                .childNodes[1].childNodes[1].childNodes[0];
-            removePreviousSpans(container);
+                                .childNodes[1].childNodes[1].childNodes[0]
+            removePreviousSpans(container)
 
-            let name = element.title.split('>')[1].split('<')[0];
-            let value = format(element.title, name);
-            name = trueName(name);
+            let name = element.title.split('>')[1].split('<')[0]
+            let value = format(element.title, name)
+            name = trueName(name)
 
-            const span1 = document.createElement('span');
-            span1.classList.add("custom-bonus-label");
-            span1.textContent = ` (${value} ${name}`;
-            container.appendChild(span1);
+            const span1 = document.createElement('span')
+            span1.classList.add("custom-bonus-label")
+            span1.textContent = ` (${value} ${name}`
+            container.appendChild(span1)
 
-            const nextBonus = element.parentElement.childNodes[1];
+            const nextBonus = element.parentElement.childNodes[1]
             if (nextBonus && !nextBonus.className.includes('blank-bonus') && nextBonus.title) {
-                name = nextBonus.title.split('>')[1].split('<')[0];
-                value = format(nextBonus.title, name);
-                name = trueName(name);
+                name = nextBonus.title.split('>')[1].split('<')[0]
+                value = format(nextBonus.title, name)
+                name = trueName(name)
 
-                const span2 = document.createElement('span');
-                span2.classList.add("custom-bonus-label");
-                span2.textContent = `, ${value} ${name})`;
-                container.appendChild(span2);
+                const span2 = document.createElement('span')
+                span2.classList.add("custom-bonus-label")
+                span2.textContent = `, ${value} ${name})`
+                container.appendChild(span2)
             } else {
-                span1.textContent += ')';
+                span1.textContent += ')'
             }
         }
     }
