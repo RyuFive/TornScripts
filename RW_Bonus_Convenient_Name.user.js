@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.8
+// @version      5.9
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -420,22 +420,13 @@ function inventoryandbazaar(triggered) {
             if (!element?.title) return;
 
             // Locate container once
-            var container = row.parentElement
-            ?.parentElement
-            ?.parentElement
-            ?.childNodes?.[3]
-            ?.childNodes?.[1]
-            ?.childNodes?.[3]
-            ?.childNodes?.[3]
-
+            var parent = container = row.parentElement?.parentElement?.parentElement
+            var container = ""
             if(isMobile()) {
-                container = row.parentElement
-                ?.parentElement
-                ?.parentElement
-                ?.childNodes?.[3]
-                ?.childNodes?.[3]
-                ?.childNodes?.[3]
-                ?.childNodes?.[3]
+                container = parent.querySelector(".name")
+            }
+            else {
+                container = parent.querySelector(".name")
             }
 
             if (!container) return;
