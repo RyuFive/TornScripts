@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      5.9
+// @version      6.0
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -83,6 +83,7 @@
     }
     #armoury-weapons .loaned {
       width: 75px !important;
+      overflow: visible !important;
     }
     #armoury-weapons .type {
       width: 133px !important;
@@ -321,6 +322,7 @@ function armory(triggered) {
         // Locate the display element (child index 9 from the grandparent)
         const display = root.parentElement?.parentElement?.childNodes?.[3]
         if (!display) return
+        if (display.textContent.endsWith(")")) return
 
         // Locate the display element (child index 9 from the grandparent)
         const createBonusText = (child) => {
@@ -540,6 +542,43 @@ function newItemMarket(triggered) {
     }
 }
 
+function addItem(triggered) {
+    const row = triggered[0]
+    const bonusElement = row?.childNodes[3]?.childNodes[0]
+    const bonusDoesNotExist = row?.childNodes[3]?.childNodes[0]?.className.includes("bonus-attachment-blank-bonus-25")
+    if (bonusDoesNotExist) {
+        return
+    }
+    const parentElement = row?.parentElement?.parentElement?.parentElement?.childNodes[0]?.childNodes[1]?.childNodes[0]
+
+    const parseBonus = el => {
+        if (!el || el.classList.contains("bonus-attachment-blank-bonus-25")) return null
+        const cls = [...el.classList].find(c => c.startsWith("bonus-attachment-"))
+        if (!cls) return null
+        const name = cls.replace("bonus-attachment-", "")
+        return [format(cls.trim(), name.trim()), trueName(name.trim().charAt(0).toUpperCase() + name.trim().slice(1))].filter(Boolean).join(" ")
+    }
+
+
+    // Primary bonus
+    const bonuses = [parseBonus(bonusElement)]
+
+    // Secondary bonus
+    const nextBonus = bonuses?.parentElement?.childNodes[1]
+    if (nextBonus && !nextBonus.className?.includes('blank-bonus')) {
+        const parsed = parseBonus(nextBonus)
+        if (parsed) bonuses.push(parsed)
+    }
+
+    // Build and append single span
+    if (bonuses[0]) {
+        parentElement.innerHTML += "<br>"
+        parentElement.className += " custom-bonus-label"
+        parentElement.textContent += ` (${bonuses.join(', ')})`
+    }
+
+}
+
 
 function rerunNewItemMarket() {
     document.querySelectorAll(".itemTile___cbw7w").forEach(el => {
@@ -645,7 +684,8 @@ const observerMap = {
   ".extraBonusIcon___x2WH_": manage,
   ".bonuses-wrap": inventoryandbazaar,
   ".bonus": armory,
-  ".itemTile___cbw7w": newItemMarket
+  ".itemTile___cbw7w": newItemMarket,
+  // ".properties___wA7fL": addItem
 };
 
 const seenElements = new WeakSet();
