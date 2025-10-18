@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      6.1
+// @version      6.1.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -86,22 +86,22 @@
       overflow: visible !important;
     }
     #armoury-weapons .type {
-      width: 133px !important;
+      width: 126px !important;
     }
     #armoury-weapons .double {
       height: 40px !important;
-      line-height: 20px !important;
+      line-height: 15px !important;
     }
     #armoury-armour .loaned {
       width: 75px !important;
       overflow: visible !important;
     }
     #armoury-armour .type {
-      width: 133px !important;
+      width: 126px !important;
     }
     #armoury-armour .double {
       height: 40px !important;
-      line-height: 20px !important;
+      line-height: 15px !important;
     }`;
     const style = document.createElement('style');
     style.textContent = css;
