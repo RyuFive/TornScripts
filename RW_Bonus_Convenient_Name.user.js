@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.0
+// @version      7.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -686,7 +686,9 @@ function newItemMarket(triggered) {
     // 🟩 Create and append badge
     const badge1 = createBonusBadge(value1, name1);
     badge1.style.fontSize = '0.9em';
-    leftColumn.appendChild(badge1);
+    const appendNode = leftColumn.parentElement.parentElement.parentElement.parentElement
+    appendNode.appendChild(badge1);
+    appendNode.style.height = "132px"
 
     leftColumn.classList.add("custom-itemmarket-container");
 
@@ -700,7 +702,7 @@ function newItemMarket(triggered) {
 
         const badge2 = createBonusBadge(value2, name2);
         badge2.style.fontSize = '0.9em';
-        leftColumn.appendChild(badge2);
+        appendNode.appendChild(badge2);
     }
 }
 
