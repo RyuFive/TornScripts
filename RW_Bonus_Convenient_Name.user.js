@@ -225,9 +225,12 @@ function createBonusBadge(value, name) {
         const { min, max } = range;
         const percent = ((numericValue - min) / (max - min)) * 100;
 
-        if (percent >= 75) gradient = 'linear-gradient(90deg, #023020, #228B22)'; // green
-        else if (percent >= 35) gradient = 'linear-gradient(90deg, #8A6500, #bF6F00)'; // yellow
-        else gradient = 'linear-gradient(90deg, #800020, #C04000)'; // red
+        const badgeOpacity = 0.75; // 🎛️ Adjust transparency (0 = invisible, 1 = solid)
+
+        if (percent >= 75) gradient = `linear-gradient(90deg, rgba(2,48,32,${badgeOpacity}), rgba(34,139,34,${badgeOpacity}))`; // green
+        else if (percent >= 35) gradient = `linear-gradient(90deg, rgba(138,101,0,${badgeOpacity}), rgba(191,111,0,${badgeOpacity}))`; // yellow
+        else gradient = `linear-gradient(90deg, rgba(128,0,32,${badgeOpacity}), rgba(192,64,0,${badgeOpacity}))`; // red
+
     }
 
     const unitOverrides = { disarm: 'T', freeze: 's' };
