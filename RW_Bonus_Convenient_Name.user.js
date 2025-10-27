@@ -16,6 +16,7 @@
 // @license      MIT
 // ==/UserScript==
 
+let bonusColorsEnabled = true;
 
 (function addCustomStyles() {
   const css = `
@@ -125,7 +126,6 @@
     document.head.appendChild(style);
 })();
 
-let bonusColorsEnabled = true
 
 const bonusRanges = {
   // Weapon bonuses
@@ -173,7 +173,7 @@ const bonusRanges = {
   "home run": { min: 50, max: 93 },
   irradiate: { min: 100, max: 100 },
   motivation: { min: 15, max: 35 },
-  paralyza: { min: 5, max: 18 },
+  paralyze: { min: 5, max: 18 },
   parry: { min: 50, max: 92 },
   penetrate: { min: 25, max: 49 },
   plunder: { min: 20, max: 49 },
