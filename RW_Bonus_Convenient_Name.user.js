@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      6.1.1
+// @version      7.0
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -16,7 +16,7 @@
 // @license      MIT
 // ==/UserScript==
 
-    // leftColumn.style.cssText = "float:left;white-space: nowrap;right: 0px;padding-left: 0px;top:-40px";
+
 (function addCustomStyles() {
   const css = `
     .custom-itemmarket-container {
@@ -27,6 +27,7 @@
       padding-left: 0;
     }
     .custom-bazaar-container {
+      display:
       float: left;
       white-space: nowrap;
       margin-top: 9px;
@@ -37,16 +38,18 @@
       position: relative;
     }
     .bonus-attachment-icons {
+      display: inline-table !important;
       width: auto !important;
       float: left !important;
       white-space: nowrap !important;
       padding-left: 0px !important;
+      padding-top: 3px !important;
       position: relative !important; /* needed if you use absolute children */
       top: -40px !important;
       right: 0px !important;
     }
     .custom-bonus-label {
-      font-size: 10px;
+      font-size: 12px;
       padding: 1px 4px;
       border-radius: 3px;
       margin-left: 2px;
@@ -57,6 +60,20 @@
       user-select: none;
       white-space: nowrap;       /* ✅ prevents wrapping */
       max-width: 100%;
+    }
+    .custom-bonus-badge {
+      display: inline-block;
+      font-size: 1em;
+      font-weight: 600;
+      color: #fff;
+      border-radius: 8px;
+      padding: 1px 2px;
+      white-space: nowrap;
+      line-height: 1.1em;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
+      vertical-align: middle;
+      transition: background 0.4s ease, transform 0.1s ease;
     }
     .custom-bonus-label.dark-mode {
       background: linear-gradient(145deg, rgba(51, 51, 51, 0.7), rgba(17, 17, 17, 0.7)) !important;
@@ -107,6 +124,131 @@
     style.textContent = css;
     document.head.appendChild(style);
 })();
+
+let bonusColorsEnabled = false
+
+const bonusRanges = {
+  // Weapon bonuses
+  blindfire: { min: 15, max: 20 },
+  burn: { min: 30, max: 50 },
+  demoralize: { min: 20, max: 23 },
+  emasculate: { min: 15, max: 16 },
+  freeze: { min: 20, max: 26 },
+  hazardous: { min: 20, max: 31 },
+  laceration: { min: 35, max: 45 },
+  poison: { min: 85, max: 100 },
+  "severe burning": { min: 100, max: 100 },
+  shock: { min: 75, max: 100 },
+  sleep: { min: 0, max: 0 },
+  smash: { min: 100, max: 100 },
+  spray: { min: 20, max: 24 },
+  storage: { min: 0, max: 0 },
+  toxin: { min: 30, max: 44 },
+  achilles: { min: 50, max: 149 },
+  assassinate: { min: 50, max: 148 },
+  backstab: { min: 30, max: 96 },
+  berserk: { min: 20, max: 87 },
+  bleed: { min: 20, max: 72 },
+  blindside: { min: 25, max: 96 },
+  bloodlust: { min: 10, max: 17 },
+  comeback: { min: 50, max: 127 },
+  conserve: { min: 25, max:  49},
+  cripple: { min: 20, max: 58 },
+  crusher: { min: 50, max: 133 },
+  cupid: { min: 50, max: 158 },
+  deadeye: { min: 25, max: 123 },
+  deadly: { min: 2, max: 10 },
+  disarm: { min: 3, max: 15 },
+  "double-edged": { min: 10, max: 32 },
+  "double tap": { min: 15, max: 57 },
+  empower: { min: 50, max: 206 },
+  eviscerate: { min: 15, max: 34 },
+  execute: { min: 15, max: 29 },
+  expose: { min: 7, max: 21 },
+  finale: { min: 10, max: 17 },
+  focus: { min: 15, max: 35 },
+  frenzy: { min: 5, max: 14 },
+  fury: { min: 10, max: 36 },
+  grace: { min: 20, max: 66 },
+  "home run": { min: 50, max: 93 },
+  irradiate: { min: 100, max: 100 },
+  motivation: { min: 15, max: 35 },
+  paralyza: { min: 5, max: 18 },
+  parry: { min: 50, max: 92 },
+  penetrate: { min: 25, max: 49 },
+  plunder: { min: 20, max: 49 },
+  powerful: { min: 15, max: 49 },
+  proficience: { min: 20, max: 59 },
+  puncture: { min: 20, max: 57 },
+  quicken: { min: 50, max: 219 },
+  rage: { min: 4, max: 18 },
+  revitalize: { min: 10, max: 24 },
+  roshambo: { min: 50, max: 132 },
+  slow: { min: 20, max: 64 },
+  smurf: { min: 1, max: 5 },
+  specialist: { min: 20, max: 59 },
+  stricken: { min: 30, max: 96 },
+  stun: { min: 10, max: 40 },
+  suppress: { min: 25, max: 49 },
+  "sure shot": { min: 3, max: 11 },
+  throttle: { min: 50, max: 170 },
+  warlord: { min: 15, max: 38 },
+  weaken: { min: 20, max: 63 },
+  "wind-up": { min: 125, max: 221 },
+  wither: { min: 20, max: 63 },
+
+  // Armor bonuses
+  impregnable: { min: 20, max: 29 },
+  impenetrable: { min: 20, max: 29 },
+  insurmountable: { min: 30, max: 39 },
+  invulnerable: { min: 4, max: 14 },
+  imperviable: { min: 2, max: 10 },
+  immutable: { min: 15, max: 50 },
+  irrepressible: { min: 15, max: 52 },
+  impassable: { min: 20, max: 28 }
+};
+
+
+function createBonusBadge(value, name) {
+    const badge = document.createElement('div');
+    badge.className = 'custom-bonus-badge';
+
+    // Extract numeric part of value
+    const numericValue = parseInt(String(value).replace(/[^0-9.-]/g, ''), 10) || 0;
+    const keyName = name.toLowerCase().replace(/\s+/g, ' ').trim();
+
+    // Lookup range
+    const range = bonusRanges[keyName];
+    let gradient = 'linear-gradient(90deg, #333, #3a3a3a)'; // default gray
+
+    if (bonusColorsEnabled && range && range.max > range.min) {
+        const { min, max } = range;
+        const percent = ((numericValue - min) / (max - min)) * 100;
+
+        if (percent >= 75) gradient = 'linear-gradient(90deg, #023020, #228B22)'; // green
+        else if (percent >= 35) gradient = 'linear-gradient(90deg, #8A6500, #bF6F00)'; // yellow
+        else gradient = 'linear-gradient(90deg, #800020, #C04000)'; // red
+    }
+
+    const unitOverrides = { disarm: 'T', freeze: 's' };
+    const unit = unitOverrides[keyName] || '%';
+
+    // Special case: irradiate — no numeric value or unit
+    if (keyName === 'irradiate') {
+        badge.textContent = name;
+        if (bonusColorsEnabled) gradient = 'linear-gradient(90deg, #023020, #228B22)'; // green
+    } else {
+        badge.textContent = `${numericValue}${unit} ${name}`;
+    }
+    badge.style.background = gradient;
+
+
+    badge.style.transform = 'scale(0.75)';
+    setTimeout(() => (badge.style.transform = ''), 100);
+
+    return badge;
+}
+
 
 function isMobile() {
     const menuDiv = document.querySelector('.header-menu.left.leftMenu___md3Ch');
@@ -188,8 +330,8 @@ function displaycase() {
         const bonusIcons = $(items[i]).find("span.bonus-attachment-icons");
         if (bonusIcons.length === 0) continue;
 
-        // Remove all existing custom spans
-        bonusIcons.find("span.custom-bonus-label").remove();
+        // Remove all existing custom badges or labels
+        bonusIcons.find("span.custom-bonus-label, span.custom-bonus-badge").remove();
 
         const first = bonusIcons[0];
         if (!first || !first.title) continue;
@@ -200,10 +342,10 @@ function displaycase() {
         let value1 = format(first.title, name1);
         name1 = trueName(name1);
 
-        const bonus1 = document.createElement('span');
-        bonus1.className = `custom-bonus-label ${document.body.classList.contains("dark-mode") ? "dark-mode" : "light-mode"}`;
-        bonus1.innerHTML = value1 + name1;
-        first.appendChild(bonus1);
+        // 🔹 Use badge instead of span
+        const badge1 = createBonusBadge(value1, name1);
+        badge1.style.fontSize = '0.9em';
+        first.appendChild(badge1);
 
         const second = bonusIcons[1];
         if (second && second.title) {
@@ -211,14 +353,13 @@ function displaycase() {
             let value2 = format(second.title, name2);
             name2 = trueName(name2);
 
-            const bonus2 = document.createElement('span');
-            bonus2.className = `custom-bonus-label ${document.body.classList.contains("dark-mode") ? "dark-mode" : "light-mode"}`;
-            bonus2.innerHTML = value2 + name2;
-            second.appendChild(bonus2);
+            // 🔹 Second badge
+            const badge2 = createBonusBadge(value2, name2);
+            badge2.style.fontSize = '0.9em';
+            second.appendChild(badge2);
         }
     }
 }
-
 
 function observeDarkModeToggle() {
     const observer = new MutationObserver((mutations) => {
@@ -241,6 +382,7 @@ function observeDarkModeToggle() {
 
 observeDarkModeToggle();
 
+
 // DISPLAY ========================================================================================================
 
 // BAZAAR ========================================================================================================
@@ -248,13 +390,10 @@ observeDarkModeToggle();
 function bazaar(triggered) {
     if (!triggered || !triggered[0] || triggered[0].childElementCount < 1) return;
 
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    const modeClass = isDarkMode ? "dark-mode" : "light-mode";
-
     const container = triggered[0];
 
-    // Remove previous custom labels if any
-    container.querySelectorAll('.custom-bonus-label').forEach(e => e.remove());
+    // Remove previous custom badges or labels if any
+    container.querySelectorAll('.custom-bonus-label, .custom-bonus-badge').forEach(e => e.remove());
 
     const appendBonus = (bonusWrapper) => {
         const element = bonusWrapper?.childNodes?.[0];
@@ -265,23 +404,24 @@ function bazaar(triggered) {
         if (!name || !desc) return;
 
         const value = formatNew(desc, name);
+        const properName = trueName(name);
 
-        const bonus = document.createElement('span');
-        bonus.className = `custom-bonus-label ${modeClass}`;
-        bonus.textContent = `${value}${name}`;
-
-        bonusWrapper.appendChild(bonus);
+        // 🔹 Create and append badge instead of span
+        const badge = createBonusBadge(value, properName);
+        badge.style.fontSize = '0.9em';
+        bonusWrapper.appendChild(badge);
     };
 
+    // 🔹 First bonus
     appendBonus(container.childNodes[0]);
 
+    // 🔹 Second bonus (if present)
     if (container.childElementCount === 2) {
         appendBonus(container.childNodes[1]);
     }
 
     container.classList.add("custom-bazaar-container");
 }
-
 
 const observer = new MutationObserver(() => {
     document.querySelectorAll(".iconBonuses____iFjZ").forEach(el => {
@@ -290,6 +430,7 @@ const observer = new MutationObserver(() => {
 });
 
 observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: false });
+
 
 // BAZAAR ========================================================================================================
 
@@ -325,30 +466,34 @@ function armory(triggered) {
         if (!display) return
         if (display.textContent.endsWith(")")) return
 
-        // Locate the display element (child index 9 from the grandparent)
-        const createBonusText = (child) => {
-            const title = child?.title
-            if (!title) return null
+        if (display.querySelector('.custom-bonus-badge')) return; // already has badges
 
-            const nameMatch = title.match(/>([^<]+)</)
-            if (!nameMatch) return null
+        // Helper to create badge data
+        const createBonusData = (child) => {
+            const title = child?.title;
+            if (!title) return null;
 
-            const rawName = nameMatch[1].trim()
-            const value = format(title, rawName)
-            return `${value}${trueName(rawName)}`
+            const nameMatch = title.match(/>([^<]+)</);
+            if (!nameMatch) return null;
+
+            const rawName = nameMatch[1].trim();
+            const value = format(title, rawName);
+            return { value, name: trueName(rawName) };
         };
 
-        // Build bonuses
+        // Collect bonuses
         const bonuses = [
-            createBonusText(root.childNodes?.[1]),
-            isWeapon && createBonusText(root.childNodes?.[3])
-        ].filter(Boolean)
+            createBonusData(root.childNodes?.[1]),
+            isWeapon && createBonusData(root.childNodes?.[3])
+        ].filter(Boolean);
 
-        // Set formatted text
+        // Append badges if found
         if (bonuses.length) {
-            display.textContent += ` (${bonuses.join(" - ")})`
+            bonuses.forEach(b => {
+                const badge = createBonusBadge(b.value, b.name);
+                display.appendChild(badge);
+            });
         }
-        display.title = display.textContent
     }
     else {
         // PC LOGIC
@@ -365,38 +510,47 @@ function armory(triggered) {
         const display = root.parentElement?.parentElement?.childNodes?.[9]
         if (!display) return
 
+        // Clear old badges
         display.textContent = ""; // Clear old content
 
-        const createBonus = (child, pad = false) => {
-            const title = child?.title
-            if (!title) return null
+        // Helper to create a bonus badge
+        const createBonusBadgeElement = (child, pad = false) => {
+            const title = child?.title;
+            if (!title) return null;
 
-            let name = title.split(">")[1]?.split("<")[0]
-            if (!name) return null
+            let name = title.split(">")[1]?.split("<")[0];
+            if (!name) return null;
 
-            const value = format(title, name)
-            name = trueName(name)
+            const value = format(title, name);
+            name = trueName(name);
 
-            const span = document.createElement("span")
-            span.className = "custom-bonus-label" // marker class
-            span.textContent = `${value}${name}`
-            if (pad) span.style.paddingLeft = "11px"
-            return span
+            const badge = createBonusBadge(value, name);
+            return badge;
         };
 
-        // Append bonuses
+        // Collect bonuses
         const bonuses = [
-            createBonus(root.childNodes?.[1]),
-            isWeapon && createBonus(root.childNodes?.[3], true)
-        ].filter(Boolean)
+            createBonusBadgeElement(root.childNodes?.[1]),
+            isWeapon && createBonusBadgeElement(root.childNodes?.[3], true)
+        ].filter(Boolean);
 
-        bonuses.forEach((bonus, i) => {
-            display.appendChild(bonus)
-            if (i === 0 && bonuses.length > 1) {
-                display.appendChild(document.createElement("br"))
-                display.classList.add("double")
-            }
-        })
+        // Append to display
+        if (bonuses.length) {
+            display.textContent = ""; // Clear text only once before adding badges
+            bonuses.forEach((badge, i) => {
+                if (bonuses.length == 2) badge.style.marginTop = "4px";
+                else badge.style.marginTop = "8px";
+                badge.style.marginBottom = "-20px";
+                badge.style.marginLeft = "8px";
+                badge.style.display = "table"
+                badge.style.paddingRight = "8px"
+                display.appendChild(badge);
+                if (i === 0 && bonuses.length > 1) {
+                    display.appendChild(document.createElement("br"));
+                    display.classList.add("double");
+                }
+            });
+        }
     }
 }
 
@@ -414,7 +568,6 @@ function inventoryandbazaar(triggered) {
     }
 
     if (link.includes('item')) {
-
         if (triggered?.[0]?.childElementCount >= 3) {
             const row = triggered[0];
             const bonusParentIndex = row.childNodes[5]?.className?.includes('testtest') ? 7 : 5;
@@ -423,13 +576,13 @@ function inventoryandbazaar(triggered) {
             if (!element?.title) return;
 
             // Locate container once
-            var parent = container = row.parentElement?.parentElement?.parentElement
-            var container = ""
-            if(isMobile()) {
-                container = parent.querySelector(".name")
-            }
-            else {
-                container = parent.querySelector(".name")
+            const parent = row.parentElement?.parentElement?.parentElement;
+            let container = "";
+
+            if (isMobile()) {
+                container = parent.querySelector(".name");
+            } else {
+                container = parent.querySelector(".name");
             }
 
             if (!container) return;
@@ -441,7 +594,9 @@ function inventoryandbazaar(triggered) {
                 const match = el.title.match(/>([^<]+)</);
                 if (!match) return null;
                 const rawName = match[1].trim();
-                return `${format(el.title, rawName)} ${trueName(rawName)}`;
+                const val = format(el.title, rawName);
+                const bonusName = trueName(rawName);
+                return { val, bonusName };
             };
 
             // Primary bonus
@@ -454,44 +609,47 @@ function inventoryandbazaar(triggered) {
                 if (parsed) bonuses.push(parsed);
             }
 
-            // Build and append single span
-            if (bonuses[0]) {
-                const span = document.createElement('span');
-                span.className = "custom-bonus-label";
-                span.textContent = ` (${bonuses.join(', ')})`;
-                container.appendChild(span);
-            }
+            // Append badges instead of spans
+            bonuses.forEach(b => {
+                if (!b?.val || !b?.bonusName) return;
+                const badge = createBonusBadge(b.val, b.bonusName);
+                badge.style.padding = '2px 6px';
+                badge.style.marginLeft = '6px';
+                container.appendChild(badge);
+            });
         }
+
     } else if (link.includes('bazaar.php#/add')) {
         if (triggered && triggered[0] && triggered[0].childElementCount >= 1) {
-            const element = triggered[0].childNodes[2]?.childNodes[0]
-            if (!element || !element.title) return
+            const element = triggered[0].childNodes[2]?.childNodes[0];
+            if (!element || !element.title) return;
 
             let container = triggered[0].parentElement.parentElement.parentElement
-                                .childNodes[1].childNodes[1].childNodes[0]
-            removePreviousSpans(container)
+            .childNodes[1].childNodes[1].childNodes[0];
 
-            let name = element.title.split('>')[1].split('<')[0]
-            let value = format(element.title, name)
-            name = trueName(name)
+            removePreviousSpans(container);
 
-            const span1 = document.createElement('span')
-            span1.classList.add("custom-bonus-label")
-            span1.textContent = ` (${value} ${name}`
-            container.appendChild(span1)
+            // 🔹 First bonus
+            let name = element.title.split('>')[1].split('<')[0];
+            let value = format(element.title, name);
+            name = trueName(name);
 
-            const nextBonus = element.parentElement.childNodes[1]
+            const badge1 = createBonusBadge(value, name);
+            badge1.style.padding = '2px 6px';
+            badge1.style.marginLeft = '6px';
+            container.appendChild(badge1);
+
+            // 🔹 Second bonus (if exists)
+            const nextBonus = element.parentElement.childNodes[1];
             if (nextBonus && !nextBonus.className.includes('blank-bonus') && nextBonus.title) {
-                name = nextBonus.title.split('>')[1].split('<')[0]
-                value = format(nextBonus.title, name)
-                name = trueName(name)
+                let name2 = nextBonus.title.split('>')[1].split('<')[0];
+                let value2 = format(nextBonus.title, name2);
+                name2 = trueName(name2);
 
-                const span2 = document.createElement('span')
-                span2.classList.add("custom-bonus-label")
-                span2.textContent = `, ${value} ${name})`
-                container.appendChild(span2)
-            } else {
-                span1.textContent += ')'
+                const badge2 = createBonusBadge(value2, name2);
+                badge2.style.padding = '2px 6px';
+                badge2.style.marginLeft = '6px';
+                container.appendChild(badge2);
             }
         }
     }
@@ -515,20 +673,21 @@ function newItemMarket(triggered) {
     const leftColumn = bonusContainer.childNodes?.[0];
     if (!leftColumn) return;
 
-    // 🔹 Remove old spans before adding new ones
-    leftColumn.querySelectorAll(".custom-bonus-label").forEach(el => el.remove());
+    // Remove old bonus badges
+    leftColumn.querySelectorAll(".custom-bonus-badge").forEach(el => el.remove());
 
     const name1 = primary.getAttribute("data-bonus-attachment-title");
     const desc1 = primary.getAttribute("data-bonus-attachment-description");
     const value1 = formatNew(desc1, name1);
 
-    const span1 = document.createElement('span');
-    span1.textContent = value1 + name1;
-    span1.className = `custom-bonus-label ${modeClass}`;
-    leftColumn.appendChild(span1);
+    // 🟩 Create and append badge
+    const badge1 = createBonusBadge(value1, name1);
+    badge1.style.fontSize = '0.9em';
+    leftColumn.appendChild(badge1);
 
     leftColumn.classList.add("custom-itemmarket-container");
 
+    // Check for second bonus
     const secondBonusExists = bonusContainer?.childNodes?.[1]?.childElementCount === 2;
     if (secondBonusExists) {
         const secondary = bonusContainer.childNodes[1].childNodes[1];
@@ -536,12 +695,12 @@ function newItemMarket(triggered) {
         const desc2 = secondary.getAttribute("data-bonus-attachment-description");
         const value2 = formatNew(desc2, name2);
 
-        const span2 = document.createElement('span');
-        span2.textContent = value2 + name2;
-        span2.className = `custom-bonus-label ${modeClass}`;
-        leftColumn.appendChild(span2);
+        const badge2 = createBonusBadge(value2, name2);
+        badge2.style.fontSize = '0.9em';
+        leftColumn.appendChild(badge2);
     }
 }
+
 
 function addItem(triggered) {
     const row = triggered[0]
