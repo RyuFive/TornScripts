@@ -125,7 +125,7 @@
     document.head.appendChild(style);
 })();
 
-let bonusColorsEnabled = false
+let bonusColorsEnabled = true
 
 const bonusRanges = {
   // Weapon bonuses
