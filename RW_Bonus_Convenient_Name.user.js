@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.2
+// @version      7.3
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -68,13 +68,21 @@ let bonusColorsEnabled = true;
       font-weight: 600;
       color: #fff;
       border-radius: 8px;
-      padding: 1px 2px;
+      padding: 3px 8px;
       white-space: nowrap;
       line-height: 1.1em;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 1px solid rgba(0,0,0,0.6);
       vertical-align: middle;
       transition: background 0.4s ease, transform 0.1s ease;
+    }
+    .custom-bonus-badge.dark-mode {
+      text-shadow: 0 0 2px rgba(0,0,0,1),0 0 3px rgba(0,0,0,0.9),0 0 3px rgba(0,0,0,0.9);
+      color: white !important;
+    }
+    .custom-bonus-badge.light-mode {
+      text-shadow: 0 0 2px rgba(255,255,255,1),0 0 3px rgba(255,255,255,0.9),0 0 3px rgba(255,255,255,0.9);
+      color: black !important;
     }
     .custom-bonus-label.dark-mode {
       background: linear-gradient(145deg, rgba(51, 51, 51, 0.7), rgba(17, 17, 17, 0.7)) !important;
@@ -210,8 +218,12 @@ const bonusRanges = {
 
 
 function createBonusBadge(value, name) {
+
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    const modeClass = isDarkMode ? "dark-mode" : "light-mode";
+
     const badge = document.createElement('div');
-    badge.className = 'custom-bonus-badge';
+    badge.className = `custom-bonus-badge ${modeClass}`;
 
     // Extract numeric part of value
     const numericValue = parseInt(String(value).replace(/[^0-9.-]/g, ''), 10) || 0;
@@ -223,13 +235,31 @@ function createBonusBadge(value, name) {
 
     if (bonusColorsEnabled && range && range.max > range.min) {
         const { min, max } = range;
-        const percent = ((numericValue - min) / (max - min)) * 100;
+        const percent = Math.min(Math.max(((numericValue - min) / (max - min)) * 100, 0), 100);
+
 
         const badgeOpacity = 0.75; // 🎛️ Adjust transparency (0 = invisible, 1 = solid)
 
-        if (percent >= 50) gradient = `linear-gradient(90deg, rgba(2,48,32,${badgeOpacity}), rgba(34,139,34,${badgeOpacity}))`; // green
-        else if (percent >= 25) gradient = `linear-gradient(90deg, rgba(138,101,0,${badgeOpacity}), rgba(191,111,0,${badgeOpacity}))`; // yellow
-        else gradient = `linear-gradient(90deg, rgba(128,0,32,${badgeOpacity}), rgba(192,64,0,${badgeOpacity}))`; // red
+        // if (percent >= 50) gradient = `linear-gradient(90deg, rgba(2,48,32,${badgeOpacity}), rgba(34,139,34,${badgeOpacity}))`; // green
+        // else if (percent >= 25) gradient = `linear-gradient(90deg, rgba(138,101,0,${badgeOpacity}), rgba(191,111,0,${badgeOpacity}))`; // yellow
+        // else gradient = `linear-gradient(90deg, rgba(128,0,32,${badgeOpacity}), rgba(192,64,0,${badgeOpacity}))`; // red
+
+        let fillColor, baseColor;
+
+        if (percent >= 50) {
+            fillColor = `rgba(128,0,32,${badgeOpacity})`; // red
+            baseColor = `rgba(128,0,32,0.2)`; // faded red
+        } else if (percent >= 25) {
+            fillColor = `rgba(191,111,0,${badgeOpacity})`; // orange
+            baseColor = `rgba(191,111,0,0.2)`; // faded orange
+        } else {
+            fillColor = `rgba(191,191,0,${badgeOpacity})`; // yellow
+            baseColor = `rgba(191,191,0,0.2)`; // faded yellow
+        }
+
+        // gradient = `linear-gradient( 90deg, ${fillColor} ${percent}%, ${baseColor} ${percent}%)`;
+        gradient = `linear-gradient( 90deg, ${fillColor} 0%, ${fillColor} ${percent - 0.1}%, ${baseColor} ${percent + 0.1}%, ${baseColor} 101%)`;
+
 
     }
 
@@ -347,7 +377,6 @@ function displaycase() {
 
         // 🔹 Use badge instead of span
         const badge1 = createBonusBadge(value1, name1);
-        badge1.style.fontSize = '0.9em';
         first.appendChild(badge1);
 
         const second = bonusIcons[1];
@@ -411,7 +440,6 @@ function bazaar(triggered) {
 
         // 🔹 Create and append badge instead of span
         const badge = createBonusBadge(value, properName);
-        badge.style.fontSize = '0.9em';
         bonusWrapper.appendChild(badge);
     };
 
@@ -693,7 +721,6 @@ function newItemMarket(triggered) {
 
     // 🟩 Create and append badge
     const badge1 = createBonusBadge(value1, name1);
-    badge1.style.fontSize = '0.9em';
     appendNode.appendChild(badge1);
     appendNode.style.height = "132px"
     leftColumn.classList.add("custom-itemmarket-container");
@@ -707,7 +734,6 @@ function newItemMarket(triggered) {
         const value2 = formatNew(desc2, name2);
 
         const badge2 = createBonusBadge(value2, name2);
-        badge2.style.fontSize = '0.9em';
         appendNode.appendChild(badge2);
     }
 
