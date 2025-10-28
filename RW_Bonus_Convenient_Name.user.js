@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.1
+// @version      7.2
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -227,8 +227,8 @@ function createBonusBadge(value, name) {
 
         const badgeOpacity = 0.75; // 🎛️ Adjust transparency (0 = invisible, 1 = solid)
 
-        if (percent >= 75) gradient = `linear-gradient(90deg, rgba(2,48,32,${badgeOpacity}), rgba(34,139,34,${badgeOpacity}))`; // green
-        else if (percent >= 35) gradient = `linear-gradient(90deg, rgba(138,101,0,${badgeOpacity}), rgba(191,111,0,${badgeOpacity}))`; // yellow
+        if (percent >= 50) gradient = `linear-gradient(90deg, rgba(2,48,32,${badgeOpacity}), rgba(34,139,34,${badgeOpacity}))`; // green
+        else if (percent >= 25) gradient = `linear-gradient(90deg, rgba(138,101,0,${badgeOpacity}), rgba(191,111,0,${badgeOpacity}))`; // yellow
         else gradient = `linear-gradient(90deg, rgba(128,0,32,${badgeOpacity}), rgba(192,64,0,${badgeOpacity}))`; // red
 
     }
@@ -666,6 +666,11 @@ function newItemMarket(triggered) {
     if (!triggered?.[0]) return;
     if (!document.URL.includes('ItemMarket')) return;
 
+    const tile = triggered[0];
+
+    // Skip if we already added badges for this tile
+    if (tile.getAttribute("data-badge-added") === "true") return;
+
     const isDarkMode = document.body.classList.contains("dark-mode");
     const modeClass = isDarkMode ? "dark-mode" : "light-mode";
 
@@ -676,8 +681,11 @@ function newItemMarket(triggered) {
     const leftColumn = bonusContainer.childNodes?.[0];
     if (!leftColumn) return;
 
+    const appendNode = leftColumn.parentElement.parentElement.parentElement.parentElement
+    if (!appendNode) return;
+
     // Remove old bonus badges
-    leftColumn.querySelectorAll(".custom-bonus-badge").forEach(el => el.remove());
+    appendNode.querySelectorAll(".custom-bonus-badge").forEach(el => el.remove());
 
     const name1 = primary.getAttribute("data-bonus-attachment-title");
     const desc1 = primary.getAttribute("data-bonus-attachment-description");
@@ -686,10 +694,8 @@ function newItemMarket(triggered) {
     // 🟩 Create and append badge
     const badge1 = createBonusBadge(value1, name1);
     badge1.style.fontSize = '0.9em';
-    const appendNode = leftColumn.parentElement.parentElement.parentElement.parentElement
     appendNode.appendChild(badge1);
     appendNode.style.height = "132px"
-
     leftColumn.classList.add("custom-itemmarket-container");
 
     // Check for second bonus
@@ -704,11 +710,17 @@ function newItemMarket(triggered) {
         badge2.style.fontSize = '0.9em';
         appendNode.appendChild(badge2);
     }
+
+    // Mark tile as processed so duplicates don't get added
+    tile.setAttribute("data-badge-added", "true");
 }
 
 
 function addItem(triggered) {
     const row = triggered[0]
+    if (!row) return;
+    // avoid adding the same text multiple times
+    if (row.getAttribute("data-label-added") === "true") return;
     const bonusElement = row?.childNodes[3]?.childNodes[0]
     const bonusDoesNotExist = row?.childNodes[3]?.childNodes[0]?.className.includes("bonus-attachment-blank-bonus-25")
     if (bonusDoesNotExist) {
@@ -741,21 +753,42 @@ function addItem(triggered) {
         parentElement.className += " custom-bonus-label"
         parentElement.textContent += ` (${bonuses.join(', ')})`
     }
+    // after you append the label:
+    row.setAttribute("data-label-added", "true");
 
 }
 
 
 function rerunNewItemMarket() {
     document.querySelectorAll(".itemTile___cbw7w").forEach(el => {
+        // existing bonus area detection (keeps your fallback)
         const bonusArea = el.querySelector(".bonuses-wrap") ||
                           el.childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0]?.childNodes?.[0];
-        if (bonusArea) {
-            bonusArea.querySelectorAll(".custom-bonus-label").forEach(span => span.remove());
-            newItemMarket([el]);
+
+        // Remove custom-bonus-labels (from addItem)
+        bonusArea?.querySelectorAll(".custom-bonus-label").forEach(span => span.remove());
+
+        // Remove badges appended to appendNode (walk up from left column similar to newItemMarket)
+        try {
+            const bonusContainer = el.childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0];
+            const leftColumn = bonusContainer?.childNodes?.[0];
+            const appendNode = leftColumn?.parentElement?.parentElement?.parentElement?.parentElement;
+            if (appendNode) {
+                appendNode.querySelectorAll(".custom-bonus-badge").forEach(node => node.remove());
+            }
+        } catch (e) {
+            // if structure differs, fall back to scanning the tile for badges
+            el.querySelectorAll(".custom-bonus-badge").forEach(node => node.remove());
         }
 
+        // Clear processed flag so newItemMarket can re-add (useful for dark mode or full reruns)
+        el.removeAttribute("data-badge-added");
+
+        // Re-run to add fresh badges
+        newItemMarket([el]);
     });
 }
+
 
 let darkModeTimer;
 const darkModeObserver = new MutationObserver(() => {
