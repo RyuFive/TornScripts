@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.3
+// @version      7.4
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -269,7 +269,13 @@ function createBonusBadge(value, name) {
     // Special case: irradiate — no numeric value or unit
     if (keyName === 'irradiate') {
         badge.textContent = name;
-        if (bonusColorsEnabled) gradient = 'linear-gradient(90deg, #023020, #228B22)'; // green
+        if (bonusColorsEnabled) {
+            var badgeOpacity = 0.75
+            var percent = 100
+            var fillColor = `rgba(191,111,0,${badgeOpacity})`; // orange
+            var baseColor = `rgba(191,111,0,0.2)`; // faded orange
+            gradient = `linear-gradient( 90deg, ${fillColor} 0%, ${fillColor} ${percent - 0.1}%, ${baseColor} ${percent + 0.1}%, ${baseColor} 101%)`;
+        }
     } else {
         badge.textContent = `${numericValue}${unit} ${name}`;
     }
@@ -354,6 +360,7 @@ function amarket() {
 // DISPLAY ========================================================================================================
 
 function displaycase() {
+
     const items = $(".bonus-attachment-icons").parents("div.iconsbonuses");
     if (items.length === 0) return;
 
@@ -377,6 +384,8 @@ function displaycase() {
 
         // 🔹 Use badge instead of span
         const badge1 = createBonusBadge(value1, name1);
+        badge1.style.lineHeight = '1em'
+        badge1.style.padding = '2px 3px'
         first.appendChild(badge1);
 
         const second = bonusIcons[1];
@@ -387,7 +396,8 @@ function displaycase() {
 
             // 🔹 Second badge
             const badge2 = createBonusBadge(value2, name2);
-            badge2.style.fontSize = '0.9em';
+            badge1.style.lineHeight = '1em'
+            badge1.style.padding = '2px 3px'
             second.appendChild(badge2);
         }
     }
@@ -440,6 +450,9 @@ function bazaar(triggered) {
 
         // 🔹 Create and append badge instead of span
         const badge = createBonusBadge(value, properName);
+        badge.style.lineHeight = '1em'
+        badge.style.fontSize = '0.9em'
+        badge.style.padding = '2px 3px'
         bonusWrapper.appendChild(badge);
     };
 
