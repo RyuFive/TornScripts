@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.5
+// @version      7.5.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -267,7 +267,7 @@ function createBonusBadge(value, name) {
     const unit = unitOverrides[keyName] || '%';
 
     // Special case: irradiate — no numeric value or unit
-    if (keyName === 'irradiate') {
+    if (keyName === 'irradiate' || keyName === 'smash') {
         badge.textContent = name;
         if (bonusColorsEnabled) {
             var badgeOpacity = 0.75
