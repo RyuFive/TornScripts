@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.4
+// @version      7.5
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -158,7 +158,7 @@ const bonusRanges = {
   berserk: { min: 20, max: 87 },
   bleed: { min: 20, max: 72 },
   blindside: { min: 25, max: 96 },
-  bloodlust: { min: 10, max: 17 },
+  bloodlust: { min: 10, max: 19 },
   comeback: { min: 50, max: 127 },
   conserve: { min: 25, max:  49},
   cripple: { min: 20, max: 58 },
@@ -371,7 +371,7 @@ function displaycase() {
         if (bonusIcons.length === 0) continue;
 
         // Remove all existing custom badges or labels
-        bonusIcons.find("span.custom-bonus-label, span.custom-bonus-badge").remove();
+        bonusIcons.find("div.custom-bonus-badge").remove();
 
         const first = bonusIcons[0];
         if (!first || !first.title) continue;
@@ -411,7 +411,7 @@ function observeDarkModeToggle() {
                 mutation.attributeName === "class"
             ) {
                 const hasDark = document.body.classList.contains("dark-mode");
-                displaycase(); // Re-apply correct styles
+                if (document.URL.includes('display')) displaycase(); // Re-apply correct styles
             }
         }
     });
