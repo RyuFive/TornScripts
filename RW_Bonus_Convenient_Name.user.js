@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.5.1
+// @version      7.5.2
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -247,7 +247,7 @@ function createBonusBadge(value, name) {
         let fillColor, baseColor;
 
         if (percent >= 50) {
-            fillColor = `rgba(128,0,32,${badgeOpacity})`; // red
+            fillColor = `rgba(180,0,40,${badgeOpacity})`; // red
             baseColor = `rgba(128,0,32,0.2)`; // faded red
         } else if (percent >= 25) {
             fillColor = `rgba(191,111,0,${badgeOpacity})`; // orange
@@ -500,7 +500,7 @@ function armory(triggered) {
         if (!root) return
 
         // Traverse up to the main armoury section
-        const armouryRoot = root.closest("#armoury-weapons, #armoury-armour")
+        const armouryRoot = root?.parentElement?.parentElement?.parentElement?.parentElement
         if (!armouryRoot) return
 
         const isWeapon = armouryRoot.id === "armoury-weapons"
@@ -545,7 +545,7 @@ function armory(triggered) {
         if (!root) return
 
         // Traverse up to the main armoury section
-        const armouryRoot = root.closest("#armoury-weapons, #armoury-armour")
+        const armouryRoot = root?.parentElement?.parentElement?.parentElement?.parentElement
         if (!armouryRoot) return
 
         const isWeapon = armouryRoot.id === "armoury-weapons"
