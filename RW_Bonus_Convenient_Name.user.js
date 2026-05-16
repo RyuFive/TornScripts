@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.5.2
+// @version      7.5.3
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -917,11 +917,11 @@ function trueName(text) {
 const observerMap = {
   ".item-cont-wrap": amarket,
   ".display-main-page": displaycase,
-  ".iconBonuses____iFjZ": bazaar,
+  ".iconBonuses___sb7SH": bazaar,
   ".extraBonusIcon___x2WH_": manage,
   ".bonuses-wrap": inventoryandbazaar,
   ".bonus": armory,
-  ".itemTile___cbw7w": newItemMarket,
+  ".itemTile___smVqb": newItemMarket,
   // ".properties___wA7fL": addItem
 };
 
