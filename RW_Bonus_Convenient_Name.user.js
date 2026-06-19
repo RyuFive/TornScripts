@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.6
+// @version      7.6.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -145,12 +145,20 @@ let bonusColorsEnabled = true
       border-radius: 0 !important;
       box-shadow: none !important;
       box-sizing: border-box !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
+      display: block !important;
       overflow: hidden !important;
-      padding: 1px 2px !important;
-      text-align: center !important;
+      padding: 0 !important;
+      text-align: left !important;
+      text-indent: 0 !important;
+    }
+    .custom-armory-bonus-text {
+      position: absolute !important;
+      left: 5px !important;
+      right: 5px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      white-space: nowrap !important;
+      line-height: 1.1em !important;
     }
     .custom-armory-bonus-badge:first-child:last-child {
       top: 0 !important;
@@ -643,20 +651,28 @@ function armory(triggered) {
 			display.style.overflow = "hidden"
 			display.classList.toggle("double", bonuses.length > 1)
 			bonuses.forEach((badge) => {
+				const text = document.createElement("span")
+				text.className = "custom-armory-bonus-text"
+				text.textContent = badge.textContent
+				badge.textContent = ""
+				badge.appendChild(text)
 				badge.classList.add("custom-armory-bonus-badge")
-				badge.style.fontSize = "11px"
+				badge.style.fontSize = bonuses.length > 1 ? "8px" : "10px"
 				badge.style.lineHeight = "1.1em"
 				badge.style.transform = ""
 				display.appendChild(badge)
-				setTimeout(() => {
+				const fitArmoryBadgeText = () => {
 					badge.style.transform = ""
 					while (
-						badge.scrollWidth > badge.clientWidth &&
+						(text.scrollWidth > text.clientWidth ||
+							text.getBoundingClientRect().height > badge.clientHeight) &&
 						parseFloat(badge.style.fontSize) > 7
 					) {
 						badge.style.fontSize = `${parseFloat(badge.style.fontSize) - 0.5}px`
 					}
-				}, 120)
+				}
+				fitArmoryBadgeText()
+				setTimeout(fitArmoryBadgeText, 120)
 			})
 		}
 	}
