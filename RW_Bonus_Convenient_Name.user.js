@@ -559,7 +559,6 @@ function armory(triggered) {
 	}
 
 	if (isMobile()) {
-        console.log("hi")
 		// MOBILE LOGIC
         const root = triggered?.[0]
         if (!root) return
@@ -576,6 +575,8 @@ function armory(triggered) {
         if (display.textContent.endsWith(")")) return
 
         if (display.querySelector('.custom-bonus-badge')) return; // already has badges
+        display.style.display = 'flex';
+        display.style.alignItems = 'baseline';
 
         // Helper to create badge data
         const createBonusData = (child) => {
