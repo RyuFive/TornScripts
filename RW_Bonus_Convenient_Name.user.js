@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.6.1
+// @version      7.7
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -329,7 +329,7 @@ function createBonusBadge(value, name) {
 }
 
 function isMobile() {
-	const menuDiv = document.querySelector(".header-menu.left.leftMenu___md3Ch")
+	const menuDiv = document.querySelector('[class*="header-menu left leftMenu___"]');
 	return menuDiv ? menuDiv.classList.contains("dropdown-menu") : false
 }
 
@@ -548,6 +548,8 @@ function manage(triggered) {
 // ARMORY ========================================================================================================
 
 function armory(triggered) {
+
+
 	const renameTypeHeader = (armouryRoot) => {
 		armouryRoot
 			?.querySelectorAll(".type")
@@ -557,52 +559,51 @@ function armory(triggered) {
 	}
 
 	if (isMobile()) {
+        console.log("hi")
 		// MOBILE LOGIC
-		const root = triggered?.[0]
-		if (!root) return
+        const root = triggered?.[0]
+        if (!root) return
 
-		// Traverse up to the main armoury section
-		const armouryRoot =
-			root?.parentElement?.parentElement?.parentElement?.parentElement
-		if (!armouryRoot) return
-		renameTypeHeader(armouryRoot)
+        // Traverse up to the main armoury section
+        const armouryRoot = root?.parentElement?.parentElement?.parentElement?.parentElement
+        if (!armouryRoot) return
 
-		const isWeapon = armouryRoot.id === "armoury-weapons"
+        const isWeapon = armouryRoot.id === "armoury-weapons"
 
-		// Locate the display element (child index 9 from the grandparent)
-		const display = root.parentElement?.parentElement?.childNodes?.[3]
-		if (!display) return
-		if (display.textContent.endsWith(")")) return
+        // Locate the display element (child index 9 from the grandparent)
+        const display = root.parentElement?.parentElement?.childNodes?.[3]
+        if (!display) return
+        if (display.textContent.endsWith(")")) return
 
-		if (display.querySelector(".custom-bonus-badge")) return // already has badges
+        if (display.querySelector('.custom-bonus-badge')) return; // already has badges
 
-		// Helper to create badge data
-		const createBonusData = (child) => {
-			const title = child?.title
-			if (!title) return null
+        // Helper to create badge data
+        const createBonusData = (child) => {
+            const title = child?.title;
+            if (!title) return null;
 
-			const nameMatch = title.match(/>([^<]+)</)
-			if (!nameMatch) return null
+            const nameMatch = title.match(/>([^<]+)</);
+            if (!nameMatch) return null;
 
-			const rawName = nameMatch[1].trim()
-			const value = format(title, rawName)
-			return { value, name: trueName(rawName) }
-		}
+            const rawName = nameMatch[1].trim();
+            const value = format(title, rawName);
+            return { value, name: trueName(rawName) };
+        };
 
-		// Collect bonuses
-		const bonuses = [
-			createBonusData(root.childNodes?.[1]),
-			isWeapon && createBonusData(root.childNodes?.[3]),
-		].filter(Boolean)
+        // Collect bonuses
+        const bonuses = [
+            createBonusData(root.childNodes?.[1]),
+            isWeapon && createBonusData(root.childNodes?.[3])
+        ].filter(Boolean);
 
-		// Append badges if found
-		if (bonuses.length) {
-			bonuses.forEach((b) => {
-				const badge = createBonusBadge(b.value, b.name)
-				display.appendChild(badge)
-			})
-		}
-	} else {
+        // Append badges if found
+        if (bonuses.length) {
+            bonuses.forEach(b => {
+                const badge = createBonusBadge(b.value, b.name);
+                display.appendChild(badge);
+            });
+        }
+    } else {
 		// PC LOGIC
 		const root = triggered?.[0]
 		if (!root) return
