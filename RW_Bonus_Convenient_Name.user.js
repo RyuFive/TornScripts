@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.7
+// @version      7.7.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -796,6 +796,7 @@ function inventoryandbazaar(triggered) {
 // ITEM MARKET ========================================================================================================
 
 function newItemMarket(triggered) {
+
 	if (!triggered?.[0]) return
 	if (!document.URL.includes("ItemMarket")) return
 
@@ -831,7 +832,7 @@ function newItemMarket(triggered) {
 	// 🟩 Create and append badge
 	const badge1 = createBonusBadge(value1, name1)
 	appendNode.appendChild(badge1)
-	appendNode.style.height = "132px"
+	appendNode.style.height = "145px"
 	leftColumn.classList.add("custom-itemmarket-container")
 
 	// Check for second bonus
@@ -1048,11 +1049,11 @@ function trueName(text) {
 const observerMap = {
 	".item-cont-wrap": amarket,
 	".display-main-page": displaycase,
-	".iconBonuses___sb7SH": bazaar,
-	".extraBonusIcon___x2WH_": manage,
+	"[class*='iconBonuses___']": bazaar,
+	"[class*='extraBonusIcon___']": manage,
 	".bonuses-wrap": inventoryandbazaar,
 	".bonus": armory,
-	".itemTile___smVqb": newItemMarket,
+	"[class*='itemTile___']": newItemMarket
 	// ".properties___wA7fL": addItem
 }
 
