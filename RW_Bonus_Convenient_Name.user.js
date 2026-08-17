@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.7.2
+// @version      7.7.3
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -328,10 +328,7 @@ function createBonusBadge(value, name) {
 	return badge
 }
 
-function isMobile() {
-	const menuDiv = document.querySelector('[class*="header-menu left leftMenu___"]');
-	return menuDiv ? menuDiv.classList.contains("dropdown-menu") : false
-}
+const isMobile = () => document.body.classList.contains("tt-mobile")
 
 // AUCTION HOUSE ========================================================================================================
 
@@ -586,14 +583,18 @@ function armory(triggered) {
 
             const rawName = nameMatch[1].trim();
             const value = format(title, rawName);
-            return { value, name: trueName(rawName) };
+
+            return {
+                value,
+                name: trueName(rawName)
+            };
         };
 
-        // Collect bonuses
-        const bonuses = [
-            createBonusData(root.childNodes?.[1]),
-            isWeapon && createBonusData(root.childNodes?.[3])
-        ].filter(Boolean);
+        // Collect all direct children that have a title
+        const bonuses = Array.from(root.children)
+        .filter(child => child.title)
+        .map(createBonusData)
+        .filter(Boolean);
 
         // Append badges if found
         if (bonuses.length) {
@@ -646,8 +647,6 @@ function armory(triggered) {
         .filter(child => child.title)
         .map((child, index) => createBonusBadgeElement(child, index > 0))
         .filter(Boolean)
-
-        console.log(bonuses)
 
 		// Append to display
 		if (bonuses.length) {
