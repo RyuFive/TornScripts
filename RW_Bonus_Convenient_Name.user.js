@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.7.1
+// @version      7.7.2
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -472,8 +472,7 @@ observeDarkModeToggle()
 // BAZAAR ========================================================================================================
 
 function bazaar(triggered) {
-	if (!triggered || !triggered[0] || triggered[0].childElementCount < 1)
-		return
+	if (!triggered || !triggered[0] || triggered[0].childElementCount < 1) return
 
 	const container = triggered[0]
 
@@ -549,7 +548,6 @@ function manage(triggered) {
 
 function armory(triggered) {
 
-
 	const renameTypeHeader = (armouryRoot) => {
 		armouryRoot
 			?.querySelectorAll(".type")
@@ -620,30 +618,36 @@ function armory(triggered) {
 		// Locate the display element (child index 9 from the grandparent)
 		const display = root.parentElement?.parentElement?.childNodes?.[9]
 		if (!display) return
-
 		// Clear old badges
 		display.textContent = "" // Clear old content
 
+        const titledChild = root.querySelector(':scope > [title]');
+
+        if (!titledChild) {
+            return;
+        }
+
 		// Helper to create a bonus badge
-		const createBonusBadgeElement = (child, pad = false) => {
-			const title = child?.title
-			if (!title) return null
+        const createBonusBadgeElement = (child, pad = false) => {
+            const title = child?.title
+            if (!title) return null
 
-			let name = title.split(">")[1]?.split("<")[0]
-			if (!name) return null
+            let name = title.split(">")[1]?.split("<")[0]
+            if (!name) return null
 
-			const value = format(title, name)
-			name = trueName(name)
+            const value = format(title, name)
+            name = trueName(name)
 
-			const badge = createBonusBadge(value, name)
-			return badge
-		}
+            return createBonusBadge(value, name)
+        }
 
-		// Collect bonuses
-		const bonuses = [
-			createBonusBadgeElement(root.childNodes?.[1]),
-			isWeapon && createBonusBadgeElement(root.childNodes?.[3], true),
-		].filter(Boolean)
+        // Collect all titled bonus children
+        const bonuses = Array.from(root.children)
+        .filter(child => child.title)
+        .map((child, index) => createBonusBadgeElement(child, index > 0))
+        .filter(Boolean)
+
+        console.log(bonuses)
 
 		// Append to display
 		if (bonuses.length) {
@@ -652,6 +656,7 @@ function armory(triggered) {
 			display.style.padding = "0"
 			display.style.overflow = "hidden"
 			display.classList.toggle("double", bonuses.length > 1)
+            display.style.height = bonuses.length > 1 ? "64px" : ""
 			bonuses.forEach((badge) => {
 				const text = document.createElement("span")
 				text.className = "custom-armory-bonus-text"
