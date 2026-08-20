@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.7.4
+// @version      7.7.5
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -328,7 +328,7 @@ function createBonusBadge(value, name) {
 	return badge
 }
 
-const isMobile = () => !!document.querySelector('[class*="menuButton___"]');
+const isMobile = () => !!document.querySelector('[class*="menuButton___"], [class*="leftMenu___"]');
 
 
 // AUCTION HOUSE ========================================================================================================
