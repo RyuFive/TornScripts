@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.7.3
+// @version      7.7.4
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -328,7 +328,8 @@ function createBonusBadge(value, name) {
 	return badge
 }
 
-const isMobile = () => document.body.classList.contains("tt-mobile")
+const isMobile = () => !!document.querySelector('[class*="menuButton___"]');
+
 
 // AUCTION HOUSE ========================================================================================================
 
@@ -571,7 +572,9 @@ function armory(triggered) {
 
         if (display.querySelector('.custom-bonus-badge')) return; // already has badges
         display.style.display = 'flex';
-        display.style.alignItems = 'baseline';
+        display.style.flexDirection = 'column';
+        display.style.alignItems = 'flex-start'
+
 
         // Helper to create badge data
         const createBonusData = (child) => {
@@ -600,7 +603,7 @@ function armory(triggered) {
         if (bonuses.length) {
             bonuses.forEach(b => {
                 const badge = createBonusBadge(b.value, b.name);
-                display.appendChild(badge);
+                display.parentElement.appendChild(badge);
             });
         }
     } else {
