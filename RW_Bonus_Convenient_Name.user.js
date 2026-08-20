@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.7.5
+// @version      7.7.6
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -328,7 +328,9 @@ function createBonusBadge(value, name) {
 	return badge
 }
 
-const isMobile = () => !!document.querySelector('[class*="menuButton___"], [class*="leftMenu___"]');
+const isMobile = () =>
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints > 0 && window.innerWidth <= 768);
 
 
 // AUCTION HOUSE ========================================================================================================
@@ -553,7 +555,7 @@ function armory(triggered) {
 				if (el.textContent.trim() === "Type") el.textContent = "Bonus"
 			})
 	}
-
+    console.log()
 	if (isMobile()) {
 		// MOBILE LOGIC
         const root = triggered?.[0]
@@ -601,10 +603,20 @@ function armory(triggered) {
 
         // Append badges if found
         if (bonuses.length) {
+            const bonusContainer = document.createElement('div');
+
+            bonusContainer.style.display = 'flex';
+            bonusContainer.style.justifyContent = 'center';
+            bonusContainer.style.alignItems = 'center';
+            bonusContainer.style.flexWrap = 'wrap';
+            bonusContainer.style.width = '100%';
+
             bonuses.forEach(b => {
                 const badge = createBonusBadge(b.value, b.name);
-                display.parentElement.appendChild(badge);
+                bonusContainer.appendChild(badge);
             });
+
+            display.parentElement.appendChild(bonusContainer);
         }
     } else {
 		// PC LOGIC
