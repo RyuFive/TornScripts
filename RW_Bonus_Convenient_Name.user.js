@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      8.0.0
+// @version      8.0.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -26,6 +26,7 @@ let bonusColorsEnabled = true
       margin-top: 15px;
       white-space: normal;
       padding-left: 0;
+
     }
     .custom-bazaar-container {
       display:
@@ -2032,6 +2033,24 @@ function newItemMarket(triggered) {
 	const badge1 = createBonusBadge(value1, name1, item_name)
 	appendNode.appendChild(badge1)
 	appendNode.style.height = "145px"
+    badge1.style.width = "80px"
+    badge1.style.boxSizing = "border-box"
+    badge1.style.whiteSpace = "nowrap"
+
+    let fontSize = parseFloat(getComputedStyle(badge1).fontSize)
+
+    // First increase width up to 110px
+    while (badge1.scrollWidth > badge1.clientWidth && badge1.clientWidth < 100) {
+        badge1.style.width = `${badge1.clientWidth + 10}px`
+    }
+
+    // Only resize text if 110px still isn't enough
+    while (badge1.scrollWidth > badge1.clientWidth && fontSize > 6) {
+        fontSize -= 0.5
+        badge1.style.fontSize = `${fontSize}px`
+    }
+    badge1.style.width = `${badge1.clientWidth + 10}px`
+
 	leftColumn.classList.add("custom-itemmarket-container")
 
 	// Check for second bonus
@@ -2047,6 +2066,24 @@ function newItemMarket(triggered) {
 
 		const badge2 = createBonusBadge(value2, name2, item_name)
 		appendNode.appendChild(badge2)
+        appendNode.style.height = "145px"
+        badge2.style.width = "80px"
+        badge2.style.boxSizing = "border-box"
+        badge2.style.whiteSpace = "nowrap"
+
+        let fontSize = parseFloat(getComputedStyle(badge2).fontSize)
+
+        // First increase width up to 110px
+        while (badge2.scrollWidth > badge2.clientWidth && badge2.clientWidth < 100) {
+            badge2.style.width = `${badge2.clientWidth + 10}px`
+        }
+
+        // Only resize text if 110px still isn't enough
+        while (badge2.scrollWidth > badge2.clientWidth && fontSize > 6) {
+            fontSize -= 0.5
+            badge2.style.fontSize = `${fontSize}px`
+        }
+        badge2.style.width = `${badge2.clientWidth + 10}px`
 	}
 
 	// Mark tile as processed so duplicates don't get added
