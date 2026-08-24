@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      7.7.6
+// @version      8.0.0
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -177,149 +177,1320 @@ let bonusColorsEnabled = true
 	document.head.appendChild(style)
 })()
 
-const bonusRanges = {
-	// Weapon bonuses
-	blindfire: { min: 15, max: 20 },
-	burn: { min: 30, max: 50 },
-	demoralize: { min: 20, max: 23 },
-	emasculate: { min: 15, max: 16 },
-	freeze: { min: 20, max: 26 },
-	hazardous: { min: 20, max: 31 },
-	laceration: { min: 35, max: 45 },
-	poison: { min: 85, max: 100 },
-	"severe burning": { min: 100, max: 100 },
-	shock: { min: 75, max: 100 },
-	sleep: { min: 0, max: 0 },
-	smash: { min: 100, max: 100 },
-	spray: { min: 20, max: 24 },
-	storage: { min: 0, max: 0 },
-	toxin: { min: 30, max: 44 },
-	achilles: { min: 50, max: 149 },
-	assassinate: { min: 50, max: 148 },
-	backstab: { min: 30, max: 96 },
-	berserk: { min: 20, max: 87 },
-	bleed: { min: 20, max: 72 },
-	blindside: { min: 25, max: 96 },
-	bloodlust: { min: 10, max: 19 },
-	comeback: { min: 50, max: 127 },
-	conserve: { min: 25, max: 49 },
-	cripple: { min: 20, max: 58 },
-	crusher: { min: 50, max: 133 },
-	cupid: { min: 50, max: 158 },
-	deadeye: { min: 25, max: 123 },
-	deadly: { min: 2, max: 10 },
-	disarm: { min: 3, max: 15 },
-	"double-edged": { min: 10, max: 32 },
-	"double tap": { min: 15, max: 57 },
-	empower: { min: 50, max: 206 },
-	eviscerate: { min: 15, max: 34 },
-	execute: { min: 15, max: 29 },
-	expose: { min: 7, max: 21 },
-	finale: { min: 10, max: 17 },
-	focus: { min: 15, max: 35 },
-	frenzy: { min: 5, max: 14 },
-	fury: { min: 10, max: 36 },
-	grace: { min: 20, max: 66 },
-	"home run": { min: 50, max: 93 },
-	irradiate: { min: 100, max: 100 },
-	motivation: { min: 15, max: 35 },
-	paralyze: { min: 5, max: 18 },
-	parry: { min: 50, max: 92 },
-	penetrate: { min: 25, max: 49 },
-	plunder: { min: 20, max: 49 },
-	powerful: { min: 15, max: 49 },
-	proficience: { min: 20, max: 59 },
-	puncture: { min: 20, max: 57 },
-	quicken: { min: 50, max: 219 },
-	rage: { min: 4, max: 18 },
-	revitalize: { min: 10, max: 24 },
-	roshambo: { min: 50, max: 132 },
-	slow: { min: 20, max: 64 },
-	smurf: { min: 1, max: 5 },
-	specialist: { min: 20, max: 59 },
-	stricken: { min: 30, max: 96 },
-	stun: { min: 10, max: 40 },
-	suppress: { min: 25, max: 49 },
-	"sure shot": { min: 3, max: 11 },
-	throttle: { min: 50, max: 170 },
-	warlord: { min: 15, max: 38 },
-	weaken: { min: 20, max: 63 },
-	"wind-up": { min: 125, max: 221 },
-	wither: { min: 20, max: 63 },
-
-	// Armor bonuses
-	impregnable: { min: 20, max: 29 },
-	impenetrable: { min: 20, max: 29 },
-	insurmountable: { min: 30, max: 39 },
-	invulnerable: { min: 4, max: 14 },
-	imperviable: { min: 2, max: 10 },
-	immutable: { min: 15, max: 50 },
-	irrepressible: { min: 15, max: 52 },
-	impassable: { min: 20, max: 28 },
+const weaponBonuses = {
+  "general": {
+    "achilles": {
+      "orange": {
+        "max": 112,
+        "min": 75
+      },
+      "red": {
+        "max": 169,
+        "min": 113
+      },
+      "yellow": {
+        "max": 74,
+        "min": 50
+      }
+    },
+    "assassinate": {
+      "orange": {
+        "max": 100,
+        "min": 70
+      },
+      "red": {
+        "max": 148,
+        "min": 100
+      },
+      "yellow": {
+        "max": 70,
+        "min": 50
+      }
+    },
+    "backstab": {
+      "orange": {
+        "max": 64,
+        "min": 44
+      },
+      "red": {
+        "max": 96,
+        "min": 66
+      },
+      "yellow": {
+        "max": 43,
+        "min": 30
+      }
+    },
+    "berserk": {
+      "orange": {
+        "max": 58,
+        "min": 36
+      },
+      "red": {
+        "max": 88,
+        "min": 60
+      },
+      "yellow": {
+        "max": 35,
+        "min": 20
+      }
+    },
+    "bleed": {
+      "orange": {
+        "max": 46,
+        "min": 31
+      },
+      "red": {
+        "max": 72,
+        "min": 48
+      },
+      "yellow": {
+        "max": 30,
+        "min": 20
+      }
+    },
+    "blindside": {
+      "orange": {
+        "max": 62,
+        "min": 40
+      },
+      "red": {
+        "max": 97,
+        "min": 63
+      },
+      "yellow": {
+        "max": 39,
+        "min": 25
+      }
+    },
+    "bloodlust": {
+      "orange": {
+        "max": 15,
+        "min": 12
+      },
+      "red": {
+        "max": 19,
+        "min": 15
+      },
+      "yellow": {
+        "max": 12,
+        "min": 10
+      }
+    },
+    "comeback": {
+      "orange": {
+        "max": 99,
+        "min": 70
+      },
+      "red": {
+        "max": 138,
+        "min": 102
+      },
+      "yellow": {
+        "max": 70,
+        "min": 50
+      }
+    },
+    "conserve": {
+      "orange": {
+        "max": 37,
+        "min": 30
+      },
+      "red": {
+        "max": 49,
+        "min": 38
+      },
+      "yellow": {
+        "max": 30,
+        "min": 25
+      }
+    },
+    "cripple": {
+      "orange": {
+        "max": 41,
+        "min": 29
+      },
+      "red": {
+        "max": 63,
+        "min": 43
+      },
+      "yellow": {
+        "max": 29,
+        "min": 20
+      }
+    },
+    "crusher": {
+      "orange": {
+        "max": 108,
+        "min": 75
+      },
+      "red": {
+        "max": 171,
+        "min": 114
+      },
+      "yellow": {
+        "max": 74,
+        "min": 50
+      }
+    },
+    "cupid": {
+      "orange": {
+        "max": 110,
+        "min": 75
+      },
+      "red": {
+        "max": 168,
+        "min": 113
+      },
+      "yellow": {
+        "max": 74,
+        "min": 50
+      }
+    },
+    "deadeye": {
+      "orange": {
+        "max": 74,
+        "min": 45
+      },
+      "red": {
+        "max": 123,
+        "min": 75
+      },
+      "yellow": {
+        "max": 45,
+        "min": 25
+      }
+    },
+    "deadly": {
+      "orange": {
+        "max": 6,
+        "min": 4
+      },
+      "red": {
+        "max": 11,
+        "min": 7
+      },
+      "yellow": {
+        "max": 3,
+        "min": 2
+      }
+    },
+    "disarm": {
+      "orange": {
+        "max": 9,
+        "min": 5
+      },
+      "red": {
+        "max": 15,
+        "min": 9
+      },
+      "yellow": {
+        "max": 5,
+        "min": 3
+      }
+    },
+    "double tap": {
+      "orange": {
+        "max": 36,
+        "min": 24
+      },
+      "red": {
+        "max": 58,
+        "min": 38
+      },
+      "yellow": {
+        "max": 24,
+        "min": 15
+      }
+    },
+    "double-edged": {
+      "orange": {
+        "max": 24,
+        "min": 16
+      },
+      "red": {
+        "max": 40,
+        "min": 25
+      },
+      "yellow": {
+        "max": 16,
+        "min": 10
+      }
+    },
+    "empower": {
+      "orange": {
+        "max": 148,
+        "min": 90
+      },
+      "red": {
+        "max": 245,
+        "min": 152
+      },
+      "yellow": {
+        "max": 89,
+        "min": 50
+      }
+    },
+    "eviscerate": {
+      "orange": {
+        "max": 25,
+        "min": 19
+      },
+      "red": {
+        "max": 34,
+        "min": 25
+      },
+      "yellow": {
+        "max": 19,
+        "min": 15
+      }
+    },
+    "execute": {
+      "orange": {
+        "max": 22,
+        "min": 18
+      },
+      "red": {
+        "max": 30,
+        "min": 23
+      },
+      "yellow": {
+        "max": 18,
+        "min": 15
+      }
+    },
+    "expose": {
+      "orange": {
+        "max": 14,
+        "min": 10
+      },
+      "red": {
+        "max": 21,
+        "min": 14
+      },
+      "yellow": {
+        "max": 9,
+        "min": 7
+      }
+    },
+    "finale": {
+      "orange": {
+        "max": 15,
+        "min": 12
+      },
+      "red": {
+        "max": 18,
+        "min": 15
+      },
+      "yellow": {
+        "max": 12,
+        "min": 10
+      }
+    },
+    "focus": {
+      "orange": {
+        "max": 24,
+        "min": 19
+      },
+      "red": {
+        "max": 35,
+        "min": 25
+      },
+      "yellow": {
+        "max": 19,
+        "min": 15
+      }
+    },
+    "frenzy": {
+      "orange": {
+        "max": 10,
+        "min": 7
+      },
+      "red": {
+        "max": 14,
+        "min": 10
+      },
+      "yellow": {
+        "max": 7,
+        "min": 5
+      }
+    },
+    "fury": {
+      "orange": {
+        "max": 24,
+        "min": 16
+      },
+      "red": {
+        "max": 40,
+        "min": 25
+      },
+      "yellow": {
+        "max": 16,
+        "min": 10
+      }
+    },
+    "grace": {
+      "orange": {
+        "max": 55,
+        "min": 36
+      },
+      "red": {
+        "max": 84,
+        "min": 60
+      },
+      "yellow": {
+        "max": 36,
+        "min": 20
+      }
+    },
+    "home run": {
+      "orange": {
+        "max": 74,
+        "min": 60
+      },
+      "red": {
+        "max": 99,
+        "min": 76
+      },
+      "yellow": {
+        "max": 59,
+        "min": 50
+      }
+    },
+    "irradiate": {
+      "orange": {
+        "max": 49,
+        "min": 20
+      },
+      "red": {
+        "max": 86,
+        "min": 50
+      },
+      "yellow": {
+        "max": 19,
+        "min": 0
+      }
+    },
+    "motivation": {
+      "orange": {
+        "max": 25,
+        "min": 19
+      },
+      "red": {
+        "max": 35,
+        "min": 25
+      },
+      "yellow": {
+        "max": 19,
+        "min": 15
+      }
+    },
+    "paralyze": {
+      "orange": {
+        "max": 12,
+        "min": 8
+      },
+      "red": {
+        "max": 18,
+        "min": 13
+      },
+      "yellow": {
+        "max": 8,
+        "min": 5
+      }
+    },
+    "parry": {
+      "orange": {
+        "max": 74,
+        "min": 60
+      },
+      "red": {
+        "max": 95,
+        "min": 75
+      },
+      "yellow": {
+        "max": 60,
+        "min": 50
+      }
+    },
+    "penetrate": {
+      "orange": {
+        "max": 37,
+        "min": 30
+      },
+      "red": {
+        "max": 49,
+        "min": 38
+      },
+      "yellow": {
+        "max": 30,
+        "min": 25
+      }
+    },
+    "plunder": {
+      "orange": {
+        "max": 35,
+        "min": 26
+      },
+      "red": {
+        "max": 49,
+        "min": 35
+      },
+      "yellow": {
+        "max": 26,
+        "min": 20
+      }
+    },
+    "powerful": {
+      "orange": {
+        "max": 32,
+        "min": 22
+      },
+      "red": {
+        "max": 50,
+        "min": 33
+      },
+      "yellow": {
+        "max": 22,
+        "min": 15
+      }
+    },
+    "proficience": {
+      "orange": {
+        "max": 39,
+        "min": 28
+      },
+      "red": {
+        "max": 59,
+        "min": 40
+      },
+      "yellow": {
+        "max": 28,
+        "min": 20
+      }
+    },
+    "puncture": {
+      "orange": {
+        "max": 27,
+        "min": 20
+      },
+      "red": {
+        "max": 39,
+        "min": 28
+      },
+      "yellow": {
+        "max": 20,
+        "min": 15
+      }
+    },
+    "quicken": {
+      "orange": {
+        "max": 149,
+        "min": 90
+      },
+      "red": {
+        "max": 245,
+        "min": 150
+      },
+      "yellow": {
+        "max": 89,
+        "min": 50
+      }
+    },
+    "rage": {
+      "orange": {
+        "max": 11,
+        "min": 7
+      },
+      "red": {
+        "max": 18,
+        "min": 11
+      },
+      "yellow": {
+        "max": 6,
+        "min": 4
+      }
+    },
+    "revitalize": {
+      "orange": {
+        "max": 17,
+        "min": 13
+      },
+      "red": {
+        "max": 24,
+        "min": 18
+      },
+      "yellow": {
+        "max": 13,
+        "min": 10
+      }
+    },
+    "roshambo": {
+      "orange": {
+        "max": 107,
+        "min": 75
+      },
+      "red": {
+        "max": 160,
+        "min": 113
+      },
+      "yellow": {
+        "max": 73,
+        "min": 50
+      }
+    },
+    "slow": {
+      "orange": {
+        "max": 42,
+        "min": 29
+      },
+      "red": {
+        "max": 64,
+        "min": 43
+      },
+      "yellow": {
+        "max": 29,
+        "min": 20
+      }
+    },
+    "smurf": {
+      "orange": {
+        "max": 3,
+        "min": 2
+      },
+      "red": {
+        "max": 5,
+        "min": 3
+      },
+      "yellow": {
+        "max": 1,
+        "min": 1
+      }
+    },
+    "specialist": {
+      "orange": {
+        "max": 39,
+        "min": 28
+      },
+      "red": {
+        "max": 59,
+        "min": 40
+      },
+      "yellow": {
+        "max": 28,
+        "min": 20
+      }
+    },
+    "stricken": {
+      "orange": {
+        "max": 63,
+        "min": 44
+      },
+      "red": {
+        "max": 99,
+        "min": 69
+      },
+      "yellow": {
+        "max": 43,
+        "min": 30
+      }
+    },
+    "stun": {
+      "orange": {
+        "max": 25,
+        "min": 16
+      },
+      "red": {
+        "max": 40,
+        "min": 25
+      },
+      "yellow": {
+        "max": 16,
+        "min": 10
+      }
+    },
+    "suppress": {
+      "orange": {
+        "max": 42,
+        "min": 32
+      },
+      "red": {
+        "max": 51,
+        "min": 43
+      },
+      "yellow": {
+        "max": 32,
+        "min": 25
+      }
+    },
+    "sure shot": {
+      "orange": {
+        "max": 8,
+        "min": 5
+      },
+      "red": {
+        "max": 12,
+        "min": 8
+      },
+      "yellow": {
+        "max": 4,
+        "min": 3
+      }
+    },
+    "throttle": {
+      "orange": {
+        "max": 111,
+        "min": 75
+      },
+      "red": {
+        "max": 170,
+        "min": 113
+      },
+      "yellow": {
+        "max": 74,
+        "min": 50
+      }
+    },
+    "warlord": {
+      "orange": {
+        "max": 27,
+        "min": 20
+      },
+      "red": {
+        "max": 45,
+        "min": 28
+      },
+      "yellow": {
+        "max": 20,
+        "min": 15
+      }
+    },
+    "weaken": {
+      "orange": {
+        "max": 42,
+        "min": 29
+      },
+      "red": {
+        "max": 63,
+        "min": 43
+      },
+      "yellow": {
+        "max": 29,
+        "min": 20
+      }
+    },
+    "wind-up": {
+      "orange": {
+        "max": 174,
+        "min": 145
+      },
+      "red": {
+        "max": 221,
+        "min": 175
+      },
+      "yellow": {
+        "max": 145,
+        "min": 125
+      }
+    },
+    "wither": {
+      "orange": {
+        "max": 42,
+        "min": 29
+      },
+      "red": {
+        "max": 64,
+        "min": 43
+      },
+      "yellow": {
+        "max": 29,
+        "min": 20
+      }
+    }
+  },
+  "special": {
+    "blindfire": {
+      "max": 20,
+      "min": 15
+    },
+    "burn": {
+      "max": 50,
+      "min": 30
+    },
+    "demoralize": {
+      "max": 23,
+      "min": 20
+    },
+    "emasculate": {
+      "max": 16,
+      "min": 15
+    },
+    "freeze": {
+      "max": 26,
+      "min": 20
+    },
+    "hazardous": {
+      "max": 31,
+      "min": 20
+    },
+    "laceration": {
+      "max": 45,
+      "min": 35
+    },
+    "poison": {
+      "max": 100,
+      "min": 85
+    },
+    "severe burning": {
+      "max": 100,
+      "min": 100
+    },
+    "shock": {
+      "max": 100,
+      "min": 75
+    },
+    "sleep": {
+      "max": 0,
+      "min": 0
+    },
+    "smash": {
+      "max": 100,
+      "min": 100
+    },
+    "spray": {
+      "max": 24,
+      "min": 20
+    },
+    "storage": {
+      "max": 0,
+      "min": 0
+    },
+    "toxin": {
+      "max": 44,
+      "min": 30
+    }
+  }
 }
 
-function createBonusBadge(value, name) {
+
+const armorBonuses = {
+    "100": {
+      "color": "orange",
+      "max": 3,
+      "min": 2,
+      "name": "Imperviable",
+      "slots": [
+        "gloves"
+      ]
+    },
+    "110": {
+      "color": "yellow",
+      "max": 75,
+      "min": 75,
+      "name": "Kinetokinesis",
+      "slots": [
+        "body_armor"
+      ]
+    },
+    "111": {
+      "color": "yellow",
+      "max": 75,
+      "min": 75,
+      "name": "Kinetokinesis",
+      "slots": [
+        "pants"
+      ]
+    },
+    "112": {
+      "color": "yellow",
+      "max": 75,
+      "min": 75,
+      "name": "Kinetokinesis",
+      "slots": [
+        "boots"
+      ]
+    },
+    "113": {
+      "color": "yellow",
+      "max": 75,
+      "min": 75,
+      "name": "Kinetokinesis",
+      "slots": [
+        "gloves"
+      ]
+    },
+    "114": {
+      "color": "yellow",
+      "max": 75,
+      "min": 75,
+      "name": "Kinetokinesis",
+      "slots": [
+        "helmet"
+      ]
+    },
+    "115": {
+      "color": "orange",
+      "max": 43,
+      "min": 30,
+      "name": "Immutable",
+      "slots": [
+        "helmet"
+      ]
+    },
+    "116": {
+      "color": "orange",
+      "max": 52,
+      "min": 40,
+      "name": "Immutable",
+      "slots": [
+        "body_armor"
+      ]
+    },
+    "117": {
+      "color": "orange",
+      "max": 33,
+      "min": 25,
+      "name": "Immutable",
+      "slots": [
+        "pants"
+      ]
+    },
+    "118": {
+      "color": "orange",
+      "max": 19,
+      "min": 15,
+      "name": "Immutable",
+      "slots": [
+        "boots"
+      ]
+    },
+    "119": {
+      "color": "orange",
+      "max": 19,
+      "min": 15,
+      "name": "Immutable",
+      "slots": [
+        "gloves"
+      ]
+    },
+    "121": {
+      "color": "orange",
+      "max": 41,
+      "min": 30,
+      "name": "Irrepressible",
+      "slots": [
+        "helmet"
+      ]
+    },
+    "122": {
+      "color": "orange",
+      "max": 52,
+      "min": 40,
+      "name": "Irrepressible",
+      "slots": [
+        "body_armor"
+      ]
+    },
+    "123": {
+      "color": "orange",
+      "max": 33,
+      "min": 25,
+      "name": "Irrepressible",
+      "slots": [
+        "pants"
+      ]
+    },
+    "124": {
+      "color": "orange",
+      "max": 19,
+      "min": 15,
+      "name": "Irrepressible",
+      "slots": [
+        "boots"
+      ]
+    },
+    "125": {
+      "color": "orange",
+      "max": 19,
+      "min": 15,
+      "name": "Irrepressible",
+      "slots": [
+        "gloves"
+      ]
+    },
+    "15": {
+      "color": "yellow",
+      "max": 29,
+      "min": 20,
+      "name": "Impregnable",
+      "slots": [
+        "helmet",
+        "body_armor",
+        "pants",
+        "boots",
+        "gloves"
+      ]
+    },
+    "17": {
+      "color": "yellow",
+      "max": 29,
+      "min": 20,
+      "name": "Impenetrable",
+      "slots": [
+        "helmet",
+        "body_armor",
+        "pants",
+        "boots",
+        "gloves"
+      ]
+    },
+    "22": {
+      "color": "orange",
+      "max": 7,
+      "min": 5,
+      "name": "Imperviable",
+      "slots": [
+        "helmet"
+      ]
+    },
+    "26": {
+      "color": "red",
+      "max": 29,
+      "min": 20,
+      "name": "Impassable",
+      "slots": [
+        "helmet",
+        "body_armor",
+        "pants",
+        "boots",
+        "gloves"
+      ]
+    },
+    "90": {
+      "color": "yellow",
+      "max": 82,
+      "min": 1,
+      "name": "Radiation Protection",
+      "slots": [
+        "helmet"
+      ]
+    },
+    "91": {
+      "color": "orange",
+      "max": 15,
+      "min": 12,
+      "name": "Invulnerable",
+      "slots": [
+        "helmet"
+      ]
+    },
+    "92": {
+      "color": "yellow",
+      "max": 40,
+      "min": 30,
+      "name": "Insurmountable",
+      "slots": [
+        "helmet",
+        "body_armor",
+        "pants",
+        "boots",
+        "gloves"
+      ]
+    },
+    "93": {
+      "color": "orange",
+      "max": 11,
+      "min": 8,
+      "name": "Invulnerable",
+      "slots": [
+        "body_armor"
+      ]
+    },
+    "94": {
+      "color": "orange",
+      "max": 10,
+      "min": 7,
+      "name": "Invulnerable",
+      "slots": [
+        "pants"
+      ]
+    },
+    "95": {
+      "color": "orange",
+      "max": 7,
+      "min": 4,
+      "name": "Invulnerable",
+      "slots": [
+        "boots"
+      ]
+    },
+    "96": {
+      "color": "orange",
+      "max": 7,
+      "min": 4,
+      "name": "Invulnerable",
+      "slots": [
+        "gloves"
+      ]
+    },
+    "97": {
+      "color": "orange",
+      "max": 11,
+      "min": 7,
+      "name": "Imperviable",
+      "slots": [
+        "body_armor"
+      ]
+    },
+    "98": {
+      "color": "orange",
+      "max": 6,
+      "min": 4,
+      "name": "Imperviable",
+      "slots": [
+        "pants"
+      ]
+    },
+    "99": {
+      "color": "orange",
+      "max": 3,
+      "min": 2,
+      "name": "Imperviable",
+      "slots": [
+        "boots"
+      ]
+    }
+  }
+
+function createBonusBadge(value, bonus_name, item_name) {
 	const isDarkMode = document.body.classList.contains("dark-mode")
 	const modeClass = isDarkMode ? "dark-mode" : "light-mode"
 
 	const badge = document.createElement("div")
 	badge.className = `custom-bonus-badge ${modeClass}`
 
-	// Extract numeric part of value
 	const numericValue =
 		parseInt(String(value).replace(/[^0-9.-]/g, ""), 10) || 0
-	const keyName = name.toLowerCase().replace(/\s+/g, " ").trim()
 
-	// Lookup range
-	const range = bonusRanges[keyName]
-	let gradient = "linear-gradient(90deg, #333, #3a3a3a)" // default gray
+	const bonusName = String(bonus_name || "").trim().toLowerCase()
 
-	if (bonusColorsEnabled && range && range.max > range.min) {
-		const { min, max } = range
-		const percent = Math.min(
-			Math.max(((numericValue - min) / (max - min)) * 100, 0),
-			100,
-		)
+	let gradient = "linear-gradient(90deg, #333, #3a3a3a)"
 
-		const badgeOpacity = 0.75 // 🎛️ Adjust transparency (0 = invisible, 1 = solid)
+	// --------------------------------------------------
+	// Determine item slot
+	// --------------------------------------------------
 
-		// if (percent >= 50) gradient = `linear-gradient(90deg, rgba(2,48,32,${badgeOpacity}), rgba(34,139,34,${badgeOpacity}))`; // green
-		// else if (percent >= 25) gradient = `linear-gradient(90deg, rgba(138,101,0,${badgeOpacity}), rgba(191,111,0,${badgeOpacity}))`; // yellow
-		// else gradient = `linear-gradient(90deg, rgba(128,0,32,${badgeOpacity}), rgba(192,64,0,${badgeOpacity}))`; // red
+	const itemLower = String(item_name || "").toLowerCase()
 
-		let fillColor, baseColor
+	let itemSlot = null
 
-		if (percent >= 50) {
-			fillColor = `rgba(180,0,40,${badgeOpacity})` // red
-			baseColor = `rgba(128,0,32,0.2)` // faded red
-		} else if (percent >= 25) {
-			fillColor = `rgba(191,111,0,${badgeOpacity})` // orange
-			baseColor = `rgba(191,111,0,0.2)` // faded orange
-		} else {
-			fillColor = `rgba(191,191,0,${badgeOpacity})` // yellow
-			baseColor = `rgba(191,191,0,0.2)` // faded yellow
-		}
+    if (itemLower.includes("gloves")) {
+        itemSlot = "gloves"
+    } else if (
+        itemLower.includes("boots") ||
+        itemLower.includes("hooves")
+              ) {
+        itemSlot = "boots"
+    } else if (
+        itemLower.includes("helmet") ||
+        itemLower.includes("mask") ||
+        itemLower.includes("respirator")
+    ) {
+        itemSlot = "helmet"
+    } else if (itemLower.includes("pants")) {
+        itemSlot = "pants"
+    } else if (
+        itemLower.includes("body") ||
+        itemLower.includes("apron") ||
+        itemLower.includes("vest") ||
+        itemLower.includes("mail") ||
+        itemLower.includes("suit") ||
+        itemLower.includes("jacket")
+    ) {
+        itemSlot = "body_armor"
+    }
 
-		// gradient = `linear-gradient( 90deg, ${fillColor} ${percent}%, ${baseColor} ${percent}%)`;
-		gradient = `linear-gradient( 90deg, ${fillColor} 0%, ${fillColor} ${percent - 0.1}%, ${baseColor} ${percent + 0.1}%, ${baseColor} 101%)`
-	}
+	// --------------------------------------------------
+	// Find armor bonus specifically for this slot
+	// --------------------------------------------------
 
-	const unitOverrides = { disarm: "T", freeze: "s" }
-	const unit = unitOverrides[keyName] || "%"
+	const armorBonus = Object.values(armorBonuses).find(b =>
+                                                        b?.name?.trim().toLowerCase() === bonusName &&
+                                                        b?.slots?.includes(itemSlot)
+                                                       )
 
-	// Special case: irradiate — no numeric value or unit
-	if (keyName === "irradiate" || keyName === "smash") {
-		badge.textContent = name
+	// --------------------------------------------------
+	// Find weapon bonus
+	// --------------------------------------------------
+
+	const weaponBonus =
+		weaponBonuses?.general?.[bonusName] ||
+		weaponBonuses?.special?.[bonusName]
+
+    if (!armorBonus && !weaponBonus) {
+	console.log("No matching armor or weapon bonus:", {
+		bonus_name,
+		item_name,
+		bonusName,
+		itemSlot,
+		armorBonus,
+		weaponBonus
+	})
+}
+
+	// --------------------------------------------------
+	// ARMOR
+	// --------------------------------------------------
+
+	if (armorBonus) {
 		if (bonusColorsEnabled) {
-			var badgeOpacity = 0.75
-			var percent = 100
-			var fillColor = `rgba(191,111,0,${badgeOpacity})` // orange
-			var baseColor = `rgba(191,111,0,0.2)` // faded orange
-			gradient = `linear-gradient( 90deg, ${fillColor} 0%, ${fillColor} ${percent - 0.1}%, ${baseColor} ${percent + 0.1}%, ${baseColor} 101%)`
+			const percent = armorBonus.max > armorBonus.min
+				? Math.min(
+					Math.max(
+						((numericValue - armorBonus.min) /
+							(armorBonus.max - armorBonus.min)) * 100,
+						0
+					),
+					100
+				)
+				: 100
+
+			const colors = {
+				red: {
+					fill: "rgba(180,0,40,0.75)",
+					base: "rgba(128,0,32,0.2)"
+				},
+				orange: {
+					fill: "rgba(191,111,0,0.75)",
+					base: "rgba(191,111,0,0.2)"
+				},
+				yellow: {
+					fill: "rgba(191,191,0,0.75)",
+					base: "rgba(191,191,0,0.2)"
+				}
+			}
+
+			const selected = colors[armorBonus.color]
+
+			if (selected) {
+				gradient = `linear-gradient(
+					90deg,
+					${selected.fill} 0%,
+					${selected.fill} ${percent - 0.1}%,
+					${selected.base} ${percent + 0.1}%,
+					${selected.base} 101%
+				)`
+			}
 		}
-	} else {
-		badge.textContent = `${numericValue}${unit} ${name}`
 	}
+
+	// --------------------------------------------------
+    // WEAPON
+    // --------------------------------------------------
+
+    else if (weaponBonus && bonusColorsEnabled) {
+        let color = null
+        let range = null
+
+        // General weapon bonus
+        if (weaponBonuses.general?.[bonusName]) {
+            const ranges = weaponBonuses.general[bonusName]
+
+            // Check highest color first
+            if (
+                ranges.red &&
+                numericValue >= ranges.red.min &&
+                numericValue <= ranges.red.max
+            ) {
+                color = "red"
+                range = ranges.red
+            } else if (
+                ranges.orange &&
+                numericValue >= ranges.orange.min &&
+                numericValue <= ranges.orange.max
+            ) {
+                color = "orange"
+                range = ranges.orange
+            } else if (
+                ranges.yellow &&
+                numericValue >= ranges.yellow.min &&
+                numericValue <= ranges.yellow.max
+            ) {
+                color = "yellow"
+                range = ranges.yellow
+            }
+        }
+
+        // Special weapon bonus
+        else if (weaponBonuses.special?.[bonusName]) {
+            range = weaponBonuses.special[bonusName]
+
+            if (
+                numericValue >= range.min &&
+                numericValue <= range.max
+            ) {
+                color = "orange"
+            }
+        }
+
+        if (color && range) {
+            const percent = range.max > range.min
+            ? Math.min(
+                Math.max(
+                    ((numericValue - range.min) /
+                     (range.max - range.min)) * 100,
+                    0
+                ),
+                100
+            )
+            : 100
+
+            const colors = {
+                red: {
+                    fill: "rgba(180,0,40,0.75)",
+                    base: "rgba(128,0,32,0.2)"
+                },
+                orange: {
+                    fill: "rgba(191,111,0,0.75)",
+                    base: "rgba(191,111,0,0.2)"
+                },
+                yellow: {
+                    fill: "rgba(191,191,0,0.75)",
+                    base: "rgba(191,191,0,0.2)"
+                }
+            }
+
+            const selected = colors[color]
+
+            if (selected) {
+                gradient = `linear-gradient(
+				90deg,
+				${selected.fill} 0%,
+				${selected.fill} ${percent - 0.1}%,
+				${selected.base} ${percent + 0.1}%,
+				${selected.base} 101%
+			)`
+            }
+        }
+    }
+
+	// --------------------------------------------------
+	// Text
+	// --------------------------------------------------
+
+	const unitOverrides = {
+		disarm: "T",
+		freeze: "s"
+	}
+
+	const unit = unitOverrides[bonusName] || "%"
+
+	if (bonusName === "irradiate" || bonusName === "smash") {
+		badge.textContent = bonus_name
+	} else {
+		badge.textContent = `${numericValue}${unit} ${bonus_name}`
+	}
+
 	badge.style.background = gradient
 
 	badge.style.transform = "scale(0.75)"
@@ -327,6 +1498,7 @@ function createBonusBadge(value, name) {
 
 	return badge
 }
+
 
 const isMobile = () =>
     /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
@@ -416,6 +1588,8 @@ function displaycase() {
 		// Remove all existing custom badges or labels
 		bonusIcons.find("div.custom-bonus-badge").remove()
 
+        const item_name = bonusIcons[0].parentElement.parentElement.parentElement.querySelector('[class*=name]').childNodes[3].textContent
+
 		const first = bonusIcons[0]
 		if (!first || !first.title) continue
 
@@ -426,7 +1600,7 @@ function displaycase() {
 		name1 = trueName(name1)
 
 		// 🔹 Use badge instead of span
-		const badge1 = createBonusBadge(value1, name1)
+		const badge1 = createBonusBadge(value1, name1, item_name)
 		badge1.style.lineHeight = "1em"
 		badge1.style.padding = "2px 3px"
 		first.appendChild(badge1)
@@ -438,7 +1612,7 @@ function displaycase() {
 			name2 = trueName(name2)
 
 			// 🔹 Second badge
-			const badge2 = createBonusBadge(value2, name2)
+			const badge2 = createBonusBadge(value2, name2, item_name)
 			badge1.style.lineHeight = "1em"
 			badge1.style.padding = "2px 3px"
 			second.appendChild(badge2)
@@ -487,13 +1661,14 @@ function bazaar(triggered) {
 
 		const name = element.getAttribute("data-bonus-attachment-title")
 		const desc = element.getAttribute("data-bonus-attachment-description")
+        const item_name = element.parentElement.parentElement.parentElement.parentElement.querySelector('[class*=name]').textContent
 		if (!name || !desc) return
 
 		const value = formatNew(desc, name)
 		const properName = trueName(name)
 
 		// 🔹 Create and append badge instead of span
-		const badge = createBonusBadge(value, properName)
+		const badge = createBonusBadge(value, properName, item_name)
 		badge.style.lineHeight = "1em"
 		badge.style.fontSize = "0.9em"
 		badge.style.padding = "2px 3px"
@@ -555,7 +1730,6 @@ function armory(triggered) {
 				if (el.textContent.trim() === "Type") el.textContent = "Bonus"
 			})
 	}
-    console.log()
 	if (isMobile()) {
 		// MOBILE LOGIC
         const root = triggered?.[0]
@@ -601,6 +1775,8 @@ function armory(triggered) {
         .map(createBonusData)
         .filter(Boolean);
 
+        const item_name = root.parentElement.parentElement.querySelector('[class*=name]').textContent
+
         // Append badges if found
         if (bonuses.length) {
             const bonusContainer = document.createElement('div');
@@ -612,7 +1788,7 @@ function armory(triggered) {
             bonusContainer.style.width = '100%';
 
             bonuses.forEach(b => {
-                const badge = createBonusBadge(b.value, b.name);
+                const badge = createBonusBadge(b.value, b.name, item_name);
                 bonusContainer.appendChild(badge);
             });
 
@@ -642,6 +1818,7 @@ function armory(triggered) {
         if (!titledChild) {
             return;
         }
+        const item_name = root.parentElement.parentElement.querySelector('[class*=name]').textContent
 
 		// Helper to create a bonus badge
         const createBonusBadgeElement = (child, pad = false) => {
@@ -654,7 +1831,7 @@ function armory(triggered) {
             const value = format(title, name)
             name = trueName(name)
 
-            return createBonusBadge(value, name)
+            return createBonusBadge(value, name, item_name)
         }
 
         // Collect all titled bonus children
@@ -670,7 +1847,7 @@ function armory(triggered) {
 			display.style.padding = "0"
 			display.style.overflow = "hidden"
 			display.classList.toggle("double", bonuses.length > 1)
-            display.style.height = bonuses.length > 1 ? "64px" : ""
+            display.style.height = bonuses.length > 1 ? "32px" : ""
 			bonuses.forEach((badge) => {
 				const text = document.createElement("span")
 				text.className = "custom-armory-bonus-text"
@@ -751,6 +1928,7 @@ function inventoryandbazaar(triggered) {
 			}
 
 			// Primary bonus
+            const item_name = row.parentElement.parentElement.parentElement.querySelector('[class*=name]').childNodes[5].textContent
 			const bonuses = [parseBonus(element)]
 
 			// Secondary bonus
@@ -763,7 +1941,7 @@ function inventoryandbazaar(triggered) {
 			// Append badges instead of spans
 			bonuses.forEach((b) => {
 				if (!b?.val || !b?.bonusName) return
-				const badge = createBonusBadge(b.val, b.bonusName)
+				const badge = createBonusBadge(b.val, b.bonusName, item_name)
 				badge.style.padding = "2px 6px"
 				badge.style.marginLeft = "6px"
 				container.appendChild(badge)
@@ -784,8 +1962,9 @@ function inventoryandbazaar(triggered) {
 			let name = element.title.split(">")[1].split("<")[0]
 			let value = format(element.title, name)
 			name = trueName(name)
+            const item_name = triggered[0].parentElement.parentElement.parentElement.querySelector('.name-wrap .t-overflow').childNodes[0].textContent.trim()
 
-			const badge1 = createBonusBadge(value, name)
+			const badge1 = createBonusBadge(value, name, item_name)
 			badge1.style.padding = "2px 6px"
 			badge1.style.marginLeft = "6px"
 			container.appendChild(badge1)
@@ -801,7 +1980,7 @@ function inventoryandbazaar(triggered) {
 				let value2 = format(nextBonus.title, name2)
 				name2 = trueName(name2)
 
-				const badge2 = createBonusBadge(value2, name2)
+				const badge2 = createBonusBadge(value2, name2, item_name)
 				badge2.style.padding = "2px 6px"
 				badge2.style.marginLeft = "6px"
 				container.appendChild(badge2)
@@ -829,6 +2008,7 @@ function newItemMarket(triggered) {
 
 	const bonusContainer =
 		triggered[0].childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0]
+    const item_name = triggered[0]?.querySelector('[class*="name___"]')?.textContent
 	const primary = bonusContainer?.childNodes?.[1]?.childNodes?.[0]
 	if (!primary) return
 
@@ -849,7 +2029,7 @@ function newItemMarket(triggered) {
 	const value1 = formatNew(desc1, name1)
 
 	// 🟩 Create and append badge
-	const badge1 = createBonusBadge(value1, name1)
+	const badge1 = createBonusBadge(value1, name1, item_name)
 	appendNode.appendChild(badge1)
 	appendNode.style.height = "145px"
 	leftColumn.classList.add("custom-itemmarket-container")
@@ -865,7 +2045,7 @@ function newItemMarket(triggered) {
 		)
 		const value2 = formatNew(desc2, name2)
 
-		const badge2 = createBonusBadge(value2, name2)
+		const badge2 = createBonusBadge(value2, name2, item_name)
 		appendNode.appendChild(badge2)
 	}
 
