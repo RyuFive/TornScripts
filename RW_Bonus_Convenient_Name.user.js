@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      8.0.3
+// @version      8.1.0
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -16,9 +16,21 @@
 // @license      MIT
 // ==/UserScript==
 
-let bonusColorsEnabled = true
+// Shared constants for optimizations
+const STATIC_BONUSES = new Set([
+  "irradiate",
+  "smash",
+  "radiation protection",
+  "dimensiokinesis",
+  "oneirokinesis",
+]);
+const UNIT_OVERRIDES = { disarm: "T", freeze: "s" };
 
-;(function addCustomStyles() {
+const ABBREVIATIONS = {
+  "radiation protection": "Radiation",
+};
+
+(function addCustomStyles() {
 	const css = `
     .custom-itemmarket-container {
       display: flex !important;
@@ -33,7 +45,7 @@ let bonusColorsEnabled = true
       float: left;
       white-space: nowrap;
       margin-top: 9px;
-      padding-left: 5;
+      padding-left: 5px;
       top: 3px;
       right: 0px;
       display: inline-block !important;
@@ -180,1088 +192,230 @@ let bonusColorsEnabled = true
 
 const weaponBonuses = {
   "general": {
-    "achilles": {
-      "orange": {
-        "max": 112,
-        "min": 75
-      },
-      "red": {
-        "max": 169,
-        "min": 113
-      },
-      "yellow": {
-        "max": 74,
-        "min": 50
-      }
-    },
-    "assassinate": {
-      "orange": {
-        "max": 100,
-        "min": 70
-      },
-      "red": {
-        "max": 148,
-        "min": 100
-      },
-      "yellow": {
-        "max": 70,
-        "min": 50
-      }
-    },
-    "backstab": {
-      "orange": {
-        "max": 64,
-        "min": 44
-      },
-      "red": {
-        "max": 96,
-        "min": 66
-      },
-      "yellow": {
-        "max": 43,
-        "min": 30
-      }
-    },
-    "berserk": {
-      "orange": {
-        "max": 58,
-        "min": 36
-      },
-      "red": {
-        "max": 88,
-        "min": 60
-      },
-      "yellow": {
-        "max": 35,
-        "min": 20
-      }
-    },
-    "bleed": {
-      "orange": {
-        "max": 46,
-        "min": 31
-      },
-      "red": {
-        "max": 72,
-        "min": 48
-      },
-      "yellow": {
-        "max": 30,
-        "min": 20
-      }
-    },
-    "blindside": {
-      "orange": {
-        "max": 62,
-        "min": 40
-      },
-      "red": {
-        "max": 97,
-        "min": 63
-      },
-      "yellow": {
-        "max": 39,
-        "min": 25
-      }
-    },
-    "bloodlust": {
-      "orange": {
-        "max": 15,
-        "min": 12
-      },
-      "red": {
-        "max": 19,
-        "min": 15
-      },
-      "yellow": {
-        "max": 12,
-        "min": 10
-      }
-    },
-    "comeback": {
-      "orange": {
-        "max": 99,
-        "min": 70
-      },
-      "red": {
-        "max": 138,
-        "min": 102
-      },
-      "yellow": {
-        "max": 70,
-        "min": 50
-      }
-    },
-    "conserve": {
-      "orange": {
-        "max": 37,
-        "min": 30
-      },
-      "red": {
-        "max": 49,
-        "min": 38
-      },
-      "yellow": {
-        "max": 30,
-        "min": 25
-      }
-    },
-    "cripple": {
-      "orange": {
-        "max": 41,
-        "min": 29
-      },
-      "red": {
-        "max": 63,
-        "min": 43
-      },
-      "yellow": {
-        "max": 29,
-        "min": 20
-      }
-    },
-    "crusher": {
-      "orange": {
-        "max": 108,
-        "min": 75
-      },
-      "red": {
-        "max": 171,
-        "min": 114
-      },
-      "yellow": {
-        "max": 74,
-        "min": 50
-      }
-    },
-    "cupid": {
-      "orange": {
-        "max": 110,
-        "min": 75
-      },
-      "red": {
-        "max": 168,
-        "min": 113
-      },
-      "yellow": {
-        "max": 74,
-        "min": 50
-      }
-    },
-    "deadeye": {
-      "orange": {
-        "max": 74,
-        "min": 45
-      },
-      "red": {
-        "max": 123,
-        "min": 75
-      },
-      "yellow": {
-        "max": 45,
-        "min": 25
-      }
-    },
-    "deadly": {
-      "orange": {
-        "max": 6,
-        "min": 4
-      },
-      "red": {
-        "max": 11,
-        "min": 7
-      },
-      "yellow": {
-        "max": 3,
-        "min": 2
-      }
-    },
-    "disarm": {
-      "orange": {
-        "max": 9,
-        "min": 5
-      },
-      "red": {
-        "max": 15,
-        "min": 9
-      },
-      "yellow": {
-        "max": 5,
-        "min": 3
-      }
-    },
-    "double tap": {
-      "orange": {
-        "max": 36,
-        "min": 24
-      },
-      "red": {
-        "max": 58,
-        "min": 38
-      },
-      "yellow": {
-        "max": 24,
-        "min": 15
-      }
-    },
-    "double-edged": {
-      "orange": {
-        "max": 24,
-        "min": 16
-      },
-      "red": {
-        "max": 40,
-        "min": 25
-      },
-      "yellow": {
-        "max": 16,
-        "min": 10
-      }
-    },
-    "empower": {
-      "orange": {
-        "max": 148,
-        "min": 90
-      },
-      "red": {
-        "max": 245,
-        "min": 152
-      },
-      "yellow": {
-        "max": 89,
-        "min": 50
-      }
-    },
-    "eviscerate": {
-      "orange": {
-        "max": 25,
-        "min": 19
-      },
-      "red": {
-        "max": 34,
-        "min": 25
-      },
-      "yellow": {
-        "max": 19,
-        "min": 15
-      }
-    },
-    "execute": {
-      "orange": {
-        "max": 22,
-        "min": 18
-      },
-      "red": {
-        "max": 30,
-        "min": 23
-      },
-      "yellow": {
-        "max": 18,
-        "min": 15
-      }
-    },
-    "expose": {
-      "orange": {
-        "max": 14,
-        "min": 10
-      },
-      "red": {
-        "max": 21,
-        "min": 14
-      },
-      "yellow": {
-        "max": 9,
-        "min": 7
-      }
-    },
-    "finale": {
-      "orange": {
-        "max": 15,
-        "min": 12
-      },
-      "red": {
-        "max": 18,
-        "min": 15
-      },
-      "yellow": {
-        "max": 12,
-        "min": 10
-      }
-    },
-    "focus": {
-      "orange": {
-        "max": 24,
-        "min": 19
-      },
-      "red": {
-        "max": 35,
-        "min": 25
-      },
-      "yellow": {
-        "max": 19,
-        "min": 15
-      }
-    },
-    "frenzy": {
-      "orange": {
-        "max": 10,
-        "min": 7
-      },
-      "red": {
-        "max": 14,
-        "min": 10
-      },
-      "yellow": {
-        "max": 7,
-        "min": 5
-      }
-    },
-    "fury": {
-      "orange": {
-        "max": 24,
-        "min": 16
-      },
-      "red": {
-        "max": 40,
-        "min": 25
-      },
-      "yellow": {
-        "max": 16,
-        "min": 10
-      }
-    },
-    "grace": {
-      "orange": {
-        "max": 55,
-        "min": 36
-      },
-      "red": {
-        "max": 84,
-        "min": 60
-      },
-      "yellow": {
-        "max": 36,
-        "min": 20
-      }
-    },
-    "home run": {
-      "orange": {
-        "max": 74,
-        "min": 60
-      },
-      "red": {
-        "max": 99,
-        "min": 76
-      },
-      "yellow": {
-        "max": 59,
-        "min": 50
-      }
-    },
-    "irradiate": {
-      "orange": {
-        "max": 49,
-        "min": 20
-      },
-      "red": {
-        "max": 86,
-        "min": 50
-      },
-      "yellow": {
-        "max": 19,
-        "min": 0
-      }
-    },
-    "motivation": {
-      "orange": {
-        "max": 25,
-        "min": 19
-      },
-      "red": {
-        "max": 35,
-        "min": 25
-      },
-      "yellow": {
-        "max": 19,
-        "min": 15
-      }
-    },
-    "paralyze": {
-      "orange": {
-        "max": 12,
-        "min": 8
-      },
-      "red": {
-        "max": 18,
-        "min": 13
-      },
-      "yellow": {
-        "max": 8,
-        "min": 5
-      }
-    },
-    "parry": {
-      "orange": {
-        "max": 74,
-        "min": 60
-      },
-      "red": {
-        "max": 95,
-        "min": 75
-      },
-      "yellow": {
-        "max": 60,
-        "min": 50
-      }
-    },
-    "penetrate": {
-      "orange": {
-        "max": 37,
-        "min": 30
-      },
-      "red": {
-        "max": 49,
-        "min": 38
-      },
-      "yellow": {
-        "max": 30,
-        "min": 25
-      }
-    },
-    "plunder": {
-      "orange": {
-        "max": 35,
-        "min": 26
-      },
-      "red": {
-        "max": 49,
-        "min": 35
-      },
-      "yellow": {
-        "max": 26,
-        "min": 20
-      }
-    },
-    "powerful": {
-      "orange": {
-        "max": 32,
-        "min": 22
-      },
-      "red": {
-        "max": 50,
-        "min": 33
-      },
-      "yellow": {
-        "max": 22,
-        "min": 15
-      }
-    },
-    "proficience": {
-      "orange": {
-        "max": 39,
-        "min": 28
-      },
-      "red": {
-        "max": 59,
-        "min": 40
-      },
-      "yellow": {
-        "max": 28,
-        "min": 20
-      }
-    },
-    "puncture": {
-      "orange": {
-        "max": 27,
-        "min": 20
-      },
-      "red": {
-        "max": 39,
-        "min": 28
-      },
-      "yellow": {
-        "max": 20,
-        "min": 15
-      }
-    },
-    "quicken": {
-      "orange": {
-        "max": 149,
-        "min": 90
-      },
-      "red": {
-        "max": 245,
-        "min": 150
-      },
-      "yellow": {
-        "max": 89,
-        "min": 50
-      }
-    },
-    "rage": {
-      "orange": {
-        "max": 11,
-        "min": 7
-      },
-      "red": {
-        "max": 18,
-        "min": 11
-      },
-      "yellow": {
-        "max": 6,
-        "min": 4
-      }
-    },
-    "revitalize": {
-      "orange": {
-        "max": 17,
-        "min": 13
-      },
-      "red": {
-        "max": 24,
-        "min": 18
-      },
-      "yellow": {
-        "max": 13,
-        "min": 10
-      }
-    },
-    "roshambo": {
-      "orange": {
-        "max": 107,
-        "min": 75
-      },
-      "red": {
-        "max": 160,
-        "min": 113
-      },
-      "yellow": {
-        "max": 73,
-        "min": 50
-      }
-    },
-    "slow": {
-      "orange": {
-        "max": 42,
-        "min": 29
-      },
-      "red": {
-        "max": 64,
-        "min": 43
-      },
-      "yellow": {
-        "max": 29,
-        "min": 20
-      }
-    },
-    "smurf": {
-      "orange": {
-        "max": 3,
-        "min": 2
-      },
-      "red": {
-        "max": 5,
-        "min": 3
-      },
-      "yellow": {
-        "max": 1,
-        "min": 1
-      }
-    },
-    "specialist": {
-      "orange": {
-        "max": 39,
-        "min": 28
-      },
-      "red": {
-        "max": 59,
-        "min": 40
-      },
-      "yellow": {
-        "max": 28,
-        "min": 20
-      }
-    },
-    "stricken": {
-      "orange": {
-        "max": 63,
-        "min": 44
-      },
-      "red": {
-        "max": 99,
-        "min": 69
-      },
-      "yellow": {
-        "max": 43,
-        "min": 30
-      }
-    },
-    "stun": {
-      "orange": {
-        "max": 25,
-        "min": 16
-      },
-      "red": {
-        "max": 40,
-        "min": 25
-      },
-      "yellow": {
-        "max": 16,
-        "min": 10
-      }
-    },
-    "suppress": {
-      "orange": {
-        "max": 42,
-        "min": 32
-      },
-      "red": {
-        "max": 51,
-        "min": 43
-      },
-      "yellow": {
-        "max": 32,
-        "min": 25
-      }
-    },
-    "sure shot": {
-      "orange": {
-        "max": 8,
-        "min": 5
-      },
-      "red": {
-        "max": 12,
-        "min": 8
-      },
-      "yellow": {
-        "max": 4,
-        "min": 3
-      }
-    },
-    "throttle": {
-      "orange": {
-        "max": 111,
-        "min": 75
-      },
-      "red": {
-        "max": 170,
-        "min": 113
-      },
-      "yellow": {
-        "max": 74,
-        "min": 50
-      }
-    },
-    "warlord": {
-      "orange": {
-        "max": 27,
-        "min": 20
-      },
-      "red": {
-        "max": 45,
-        "min": 28
-      },
-      "yellow": {
-        "max": 20,
-        "min": 15
-      }
-    },
-    "weaken": {
-      "orange": {
-        "max": 42,
-        "min": 29
-      },
-      "red": {
-        "max": 63,
-        "min": 43
-      },
-      "yellow": {
-        "max": 29,
-        "min": 20
-      }
-    },
-    "wind-up": {
-      "orange": {
-        "max": 174,
-        "min": 145
-      },
-      "red": {
-        "max": 221,
-        "min": 175
-      },
-      "yellow": {
-        "max": 145,
-        "min": 125
-      }
-    },
-    "wither": {
-      "orange": {
-        "max": 42,
-        "min": 29
-      },
-      "red": {
-        "max": 64,
-        "min": 43
-      },
-      "yellow": {
-        "max": 29,
-        "min": 20
-      }
-    }
+    "achilles": {"orange": {"max": 112, "min": 75}, "red": {"max": 169, "min": 113}, "yellow": {"max": 74, "min": 50}},
+    "assassinate": {"orange": {"max": 100, "min": 70}, "red": {"max": 148, "min": 100}, "yellow": {"max": 70, "min": 50}},
+    "backstab": {"orange": {"max": 64, "min": 44}, "red": {"max": 96, "min": 66}, "yellow": {"max": 43, "min": 30}},
+    "berserk": {"orange": {"max": 58, "min": 36}, "red": {"max": 88, "min": 60}, "yellow": {"max": 35, "min": 20}},
+    "bleed": {"orange": {"max": 46, "min": 31}, "red": {"max": 72, "min": 48}, "yellow": {"max": 30, "min": 20}},
+    "blindside": {"orange": {"max": 62, "min": 40}, "red": {"max": 97, "min": 63}, "yellow": {"max": 39, "min": 25}},
+    "bloodlust": {"orange": {"max": 15, "min": 12}, "red": {"max": 19, "min": 15}, "yellow": {"max": 12, "min": 10}},
+    "comeback": {"orange": {"max": 99, "min": 70}, "red": {"max": 138, "min": 102}, "yellow": {"max": 70, "min": 50}},
+    "conserve": {"orange": {"max": 37, "min": 30}, "red": {"max": 49, "min": 38}, "yellow": {"max": 30, "min": 25}},
+    "cripple": {"orange": {"max": 41, "min": 29}, "red": {"max": 63, "min": 43}, "yellow": {"max": 29, "min": 20}},
+    "crusher": {"orange": {"max": 108, "min": 75}, "red": {"max": 171, "min": 114}, "yellow": {"max": 74, "min": 50}},
+    "cupid": {"orange": {"max": 110, "min": 75}, "red": {"max": 168, "min": 113}, "yellow": {"max": 74, "min": 50}},
+    "deadeye": {"orange": {"max": 74, "min": 45}, "red": {"max": 123, "min": 75}, "yellow": {"max": 45, "min": 25}},
+    "deadly": {"orange": {"max": 6, "min": 4}, "red": {"max": 11, "min": 7}, "yellow": {"max": 3, "min": 2}},
+    "disarm": {"orange": {"max": 9, "min": 5}, "red": {"max": 15, "min": 9}, "yellow": {"max": 5, "min": 3}},
+    "double tap": {"orange": {"max": 36, "min": 24}, "red": {"max": 58, "min": 38}, "yellow": {"max": 24, "min": 15}},
+    "double-edged": {"orange": {"max": 24, "min": 16}, "red": {"max": 40, "min": 25}, "yellow": {"max": 16, "min": 10}},
+    "empower": {"orange": {"max": 148, "min": 90}, "red": {"max": 245, "min": 152}, "yellow": {"max": 89, "min": 50}},
+    "eviscerate": {"orange": {"max": 25, "min": 19}, "red": {"max": 34, "min": 25}, "yellow": {"max": 19, "min": 15}},
+    "execute": {"orange": {"max": 22, "min": 18}, "red": {"max": 30, "min": 23}, "yellow": {"max": 18, "min": 15}},
+    "expose": {"orange": {"max": 14, "min": 10}, "red": {"max": 21, "min": 14}, "yellow": {"max": 9, "min": 7}},
+    "finale": {"orange": {"max": 15, "min": 12}, "red": {"max": 18, "min": 15}, "yellow": {"max": 12, "min": 10}},
+    "focus": {"orange": {"max": 24, "min": 19}, "red": {"max": 35, "min": 25}, "yellow": {"max": 19, "min": 15}},
+    "frenzy": {"orange": {"max": 10, "min": 7}, "red": {"max": 14, "min": 10}, "yellow": {"max": 7, "min": 5}},
+    "fury": {"orange": {"max": 24, "min": 16}, "red": {"max": 40, "min": 25}, "yellow": {"max": 16, "min": 10}},
+    "grace": {"orange": {"max": 55, "min": 36}, "red": {"max": 84, "min": 60}, "yellow": {"max": 36, "min": 20}},
+    "home run": {"orange": {"max": 74, "min": 60}, "red": {"max": 99, "min": 76}, "yellow": {"max": 59, "min": 50}},
+    "irradiate": {"orange": {"max": 49, "min": 20}, "red": {"max": 86, "min": 50}, "yellow": {"max": 19, "min": 0}},
+    "motivation": {"orange": {"max": 25, "min": 19}, "red": {"max": 35, "min": 25}, "yellow": {"max": 19, "min": 15}},
+    "paralyze": {"orange": {"max": 12, "min": 8}, "red": {"max": 18, "min": 13}, "yellow": {"max": 8, "min": 5}},
+    "parry": {"orange": {"max": 74, "min": 60}, "red": {"max": 95, "min": 75}, "yellow": {"max": 60, "min": 50}},
+    "penetrate": {"orange": {"max": 37, "min": 30}, "red": {"max": 49, "min": 38}, "yellow": {"max": 30, "min": 25}},
+    "plunder": {"orange": {"max": 35, "min": 26}, "red": {"max": 49, "min": 35}, "yellow": {"max": 26, "min": 20}},
+    "powerful": {"orange": {"max": 32, "min": 22}, "red": {"max": 50, "min": 33}, "yellow": {"max": 22, "min": 15}},
+    "proficience": {"orange": {"max": 39, "min": 28}, "red": {"max": 59, "min": 40}, "yellow": {"max": 28, "min": 20}},
+    "puncture": {"orange": {"max": 27, "min": 20}, "red": {"max": 39, "min": 28}, "yellow": {"max": 20, "min": 15}},
+    "quicken": {"orange": {"max": 149, "min": 90}, "red": {"max": 245, "min": 150}, "yellow": {"max": 89, "min": 50}},
+    "rage": {"orange": {"max": 11, "min": 7}, "red": {"max": 18, "min": 11}, "yellow": {"max": 6, "min": 4}},
+    "revitalize": {"orange": {"max": 17, "min": 13}, "red": {"max": 24, "min": 18}, "yellow": {"max": 13, "min": 10}},
+    "roshambo": {"orange": {"max": 107, "min": 75}, "red": {"max": 160, "min": 113}, "yellow": {"max": 73, "min": 50}},
+    "slow": {"orange": {"max": 42, "min": 29}, "red": {"max": 64, "min": 43}, "yellow": {"max": 29, "min": 20}},
+    "smurf": {"orange": {"max": 3, "min": 2}, "red": {"max": 5, "min": 3}, "yellow": {"max": 1, "min": 1}},
+    "specialist": {"orange": {"max": 39, "min": 28}, "red": {"max": 59, "min": 40}, "yellow": {"max": 28, "min": 20}},
+    "stricken": {"orange": {"max": 63, "min": 44}, "red": {"max": 99, "min": 69}, "yellow": {"max": 43, "min": 30}},
+    "stun": {"orange": {"max": 25, "min": 16}, "red": {"max": 40, "min": 25}, "yellow": {"max": 16, "min": 10}},
+    "suppress": {"orange": {"max": 42, "min": 32}, "red": {"max": 51, "min": 43}, "yellow": {"max": 32, "min": 25}},
+    "sure shot": {"orange": {"max": 8, "min": 5}, "red": {"max": 12, "min": 8}, "yellow": {"max": 4, "min": 3}},
+    "throttle": {"orange": {"max": 111, "min": 75}, "red": {"max": 170, "min": 113}, "yellow": {"max": 74, "min": 50}},
+    "warlord": {"orange": {"max": 27, "min": 20}, "red": {"max": 45, "min": 28}, "yellow": {"max": 20, "min": 15}},
+    "weaken": {"orange": {"max": 42, "min": 29}, "red": {"max": 63, "min": 43}, "yellow": {"max": 29, "min": 20}},
+    "wind-up": {"orange": {"max": 174, "min": 145}, "red": {"max": 221, "min": 175}, "yellow": {"max": 145, "min": 125}},
+    "wither": {"orange": {"max": 42, "min": 29}, "red": {"max": 64, "min": 43}, "yellow": {"max": 29, "min": 20}}
   },
   "special": {
-    "blindfire": {
-      "max": 20,
-      "min": 15
-    },
-    "burn": {
-      "max": 50,
-      "min": 30
-    },
-    "demoralize": {
-      "max": 23,
-      "min": 20
-    },
-    "emasculate": {
-      "max": 16,
-      "min": 15
-    },
-    "freeze": {
-      "max": 26,
-      "min": 20
-    },
-    "hazardous": {
-      "max": 31,
-      "min": 20
-    },
-    "laceration": {
-      "max": 45,
-      "min": 35
-    },
-    "poison": {
-      "max": 100,
-      "min": 85
-    },
-    "severe burning": {
-      "max": 100,
-      "min": 100
-    },
-    "shock": {
-      "max": 100,
-      "min": 75
-    },
-    "sleep": {
-      "max": 0,
-      "min": 0
-    },
-    "smash": {
-      "max": 100,
-      "min": 100
-    },
-    "spray": {
-      "max": 24,
-      "min": 20
-    },
-    "storage": {
-      "max": 0,
-      "min": 0
-    },
-    "toxin": {
-      "max": 44,
-      "min": 30
-    }
+    "blindfire": {"max": 20, "min": 15},
+    "burn": {"max": 50, "min": 30},
+    "demoralize": {"max": 23, "min": 20},
+    "emasculate": {"max": 16, "min": 15},
+    "freeze": {"max": 26, "min": 20},
+    "hazardous": {"max": 31, "min": 20},
+    "laceration": {"max": 45, "min": 35},
+    "poison": {"max": 100, "min": 85},
+    "severe burning": {"max": 100, "min": 100},
+    "shock": {"max": 100, "min": 75},
+    "sleep": {"max": 0, "min": 0},
+    "smash": {"max": 100, "min": 100},
+    "spray": {"max": 24, "min": 20},
+    "storage": {"max": 0, "min": 0},
+    "toxin": {"max": 44, "min": 30}
   }
 }
 
 
 const armorBonuses = {
-    "100": {
-      "color": "orange",
-      "max": 3,
-      "min": 2,
-      "name": "Imperviable",
-      "slots": [
-        "gloves"
-      ]
-    },
-    "110": {
-      "color": "yellow",
-      "max": 75,
-      "min": 75,
-      "name": "Kinetokinesis",
-      "slots": [
-        "body_armor"
-      ]
-    },
-    "111": {
-      "color": "yellow",
-      "max": 75,
-      "min": 75,
-      "name": "Kinetokinesis",
-      "slots": [
-        "pants"
-      ]
-    },
-    "112": {
-      "color": "yellow",
-      "max": 75,
-      "min": 75,
-      "name": "Kinetokinesis",
-      "slots": [
-        "boots"
-      ]
-    },
-    "113": {
-      "color": "yellow",
-      "max": 75,
-      "min": 75,
-      "name": "Kinetokinesis",
-      "slots": [
-        "gloves"
-      ]
-    },
-    "114": {
-      "color": "yellow",
-      "max": 75,
-      "min": 75,
-      "name": "Kinetokinesis",
-      "slots": [
-        "helmet"
-      ]
-    },
-    "115": {
-      "color": "orange",
-      "max": 43,
-      "min": 30,
-      "name": "Immutable",
-      "slots": [
-        "helmet"
-      ]
-    },
-    "116": {
-      "color": "orange",
-      "max": 52,
-      "min": 40,
-      "name": "Immutable",
-      "slots": [
-        "body_armor"
-      ]
-    },
-    "117": {
-      "color": "orange",
-      "max": 33,
-      "min": 25,
-      "name": "Immutable",
-      "slots": [
-        "pants"
-      ]
-    },
-    "118": {
-      "color": "orange",
-      "max": 19,
-      "min": 15,
-      "name": "Immutable",
-      "slots": [
-        "boots"
-      ]
-    },
-    "119": {
-      "color": "orange",
-      "max": 19,
-      "min": 15,
-      "name": "Immutable",
-      "slots": [
-        "gloves"
-      ]
-    },
-    "121": {
-      "color": "orange",
-      "max": 41,
-      "min": 30,
-      "name": "Irrepressible",
-      "slots": [
-        "helmet"
-      ]
-    },
-    "122": {
-      "color": "orange",
-      "max": 52,
-      "min": 40,
-      "name": "Irrepressible",
-      "slots": [
-        "body_armor"
-      ]
-    },
-    "123": {
-      "color": "orange",
-      "max": 33,
-      "min": 25,
-      "name": "Irrepressible",
-      "slots": [
-        "pants"
-      ]
-    },
-    "124": {
-      "color": "orange",
-      "max": 19,
-      "min": 15,
-      "name": "Irrepressible",
-      "slots": [
-        "boots"
-      ]
-    },
-    "125": {
-      "color": "orange",
-      "max": 19,
-      "min": 15,
-      "name": "Irrepressible",
-      "slots": [
-        "gloves"
-      ]
-    },
-    "15": {
-      "color": "yellow",
-      "max": 29,
-      "min": 20,
-      "name": "Impregnable",
-      "slots": [
-        "helmet",
-        "body_armor",
-        "pants",
-        "boots",
-        "gloves"
-      ]
-    },
-    "17": {
-      "color": "yellow",
-      "max": 29,
-      "min": 20,
-      "name": "Impenetrable",
-      "slots": [
-        "helmet",
-        "body_armor",
-        "pants",
-        "boots",
-        "gloves"
-      ]
-    },
-    "22": {
-      "color": "orange",
-      "max": 7,
-      "min": 5,
-      "name": "Imperviable",
-      "slots": [
-        "helmet"
-      ]
-    },
-    "26": {
-      "color": "red",
-      "max": 29,
-      "min": 20,
-      "name": "Impassable",
-      "slots": [
-        "helmet",
-        "body_armor",
-        "pants",
-        "boots",
-        "gloves"
-      ]
-    },
-    "90": {
-      "color": "yellow",
-      "max": 82,
-      "min": 1,
-      "name": "Radiation Protection",
-      "slots": [
-        "helmet"
-      ]
-    },
-    "91": {
-      "color": "orange",
-      "max": 15,
-      "min": 12,
-      "name": "Invulnerable",
-      "slots": [
-        "helmet"
-      ]
-    },
-    "92": {
-      "color": "yellow",
-      "max": 40,
-      "min": 30,
-      "name": "Insurmountable",
-      "slots": [
-        "helmet",
-        "body_armor",
-        "pants",
-        "boots",
-        "gloves"
-      ]
-    },
-    "93": {
-      "color": "orange",
-      "max": 11,
-      "min": 8,
-      "name": "Invulnerable",
-      "slots": [
-        "body_armor"
-      ]
-    },
-    "94": {
-      "color": "orange",
-      "max": 10,
-      "min": 7,
-      "name": "Invulnerable",
-      "slots": [
-        "pants"
-      ]
-    },
-    "95": {
-      "color": "orange",
-      "max": 7,
-      "min": 4,
-      "name": "Invulnerable",
-      "slots": [
-        "boots"
-      ]
-    },
-    "96": {
-      "color": "orange",
-      "max": 7,
-      "min": 4,
-      "name": "Invulnerable",
-      "slots": [
-        "gloves"
-      ]
-    },
-    "97": {
-      "color": "orange",
-      "max": 11,
-      "min": 7,
-      "name": "Imperviable",
-      "slots": [
-        "body_armor"
-      ]
-    },
-    "98": {
-      "color": "orange",
-      "max": 6,
-      "min": 4,
-      "name": "Imperviable",
-      "slots": [
-        "pants"
-      ]
-    },
-    "99": {
-      "color": "orange",
-      "max": 3,
-      "min": 2,
-      "name": "Imperviable",
-      "slots": [
-        "boots"
-      ]
-    }
-  }
+	"100": {"color": "orange", "max": 3, "min": 2, "name": "Imperviable", "slots": ["gloves"]},
+	"110": {"color": "yellow", "max": 75, "min": 75, "name": "Kinetokinesis", "slots": ["body_armor"]},
+	"111": {"color": "yellow", "max": 75, "min": 75, "name": "Kinetokinesis", "slots": ["pants"]},
+	"112": {"color": "yellow", "max": 75, "min": 75, "name": "Kinetokinesis", "slots": ["boots"]},
+	"113": {"color": "yellow", "max": 75, "min": 75, "name": "Kinetokinesis", "slots": ["gloves"]},
+	"114": {"color": "yellow", "max": 75, "min": 75, "name": "Kinetokinesis", "slots": ["helmet"]},
+	"115": {"color": "orange", "max": 43, "min": 30, "name": "Immutable", "slots": ["helmet"]},
+	"116": {"color": "orange", "max": 52, "min": 40, "name": "Immutable", "slots": ["body_armor"]},
+	"117": {"color": "orange", "max": 33, "min": 25, "name": "Immutable", "slots": ["pants"]},
+	"118": {"color": "orange", "max": 19, "min": 15, "name": "Immutable", "slots": ["boots"]},
+	"119": {"color": "orange", "max": 19, "min": 15, "name": "Immutable", "slots": ["gloves"]},
+	"121": {"color": "orange", "max": 41, "min": 30, "name": "Irrepressible", "slots": ["helmet"]},
+	"122": {"color": "orange", "max": 52, "min": 40, "name": "Irrepressible", "slots": ["body_armor"]},
+	"123": {"color": "orange", "max": 33, "min": 25, "name": "Irrepressible", "slots": ["pants"]},
+	"124": {"color": "orange", "max": 19, "min": 15, "name": "Irrepressible", "slots": ["boots"]},
+	"125": {"color": "orange", "max": 19, "min": 15, "name": "Irrepressible", "slots": ["gloves"]},
+	"15": {"color": "yellow", "max": 29, "min": 20, "name": "Impregnable", "slots": ["helmet", "body_armor", "pants", "boots", "gloves"]},
+	"17": {"color": "yellow", "max": 29, "min": 20, "name": "Impenetrable", "slots": ["helmet", "body_armor", "pants", "boots", "gloves"]},
+	"22": {"color": "orange", "max": 7, "min": 5, "name": "Imperviable", "slots": ["helmet"]},
+	"26": {"color": "red", "max": 29, "min": 20, "name": "Impassable", "slots": ["helmet", "body_armor", "pants", "boots", "gloves"]},
+	"90": {"color": "yellow", "max": 82, "min": 1, "name": "Radiation Protection", "slots": ["helmet"]},
+	"91": {"color": "orange", "max": 15, "min": 12, "name": "Invulnerable", "slots": ["helmet"]},
+	"92": {"color": "yellow", "max": 40, "min": 30, "name": "Insurmountable", "slots": ["helmet", "body_armor", "pants", "boots", "gloves"]},
+	"93": {"color": "orange", "max": 11, "min": 8, "name": "Invulnerable", "slots": ["body_armor"]},
+	"94": {"color": "orange", "max": 10, "min": 7, "name": "Invulnerable", "slots": ["pants"]},
+	"95": {"color": "orange", "max": 7, "min": 4, "name": "Invulnerable", "slots": ["boots"]},
+	"96": {"color": "orange", "max": 7, "min": 4, "name": "Invulnerable", "slots": ["gloves"]},
+	"97": {"color": "orange", "max": 11, "min": 7, "name": "Imperviable", "slots": ["body_armor"]},
+	"98": {"color": "orange", "max": 6, "min": 4, "name": "Imperviable", "slots": ["pants"]},
+	"99": {"color": "orange", "max": 3, "min": 2, "name": "Imperviable", "slots": ["boots"]}
+}
+
+const BONUS_COLORS = {
+	red: {
+		fill: "rgba(180,0,40,0.75)",
+		base: "rgba(128,0,32,0.2)"
+	},
+	orange: {
+		fill: "rgba(191,111,0,0.75)",
+		base: "rgba(191,111,0,0.2)"
+	},
+	yellow: {
+		fill: "rgba(191,191,0,0.75)",
+		base: "rgba(191,191,0,0.2)"
+	}
+}
+
+function createBonusGradient(value, min, max, color) {
+	const selected = BONUS_COLORS[color]
+
+	if (!selected) {
+		return "linear-gradient(90deg, #333, #3a3a3a)"
+	}
+
+	const percent = max > min
+		? Math.min(
+			Math.max(
+				((value - min) / (max - min)) * 100,
+				0
+			),
+			100
+		)
+		: 100
+
+	return `linear-gradient(
+		90deg,
+		${selected.fill} 0%,
+		${selected.fill} ${percent - 0.1}%,
+		${selected.base} ${percent + 0.1}%,
+		${selected.base} 101%
+	)`
+}
+
+function getItemSlot(itemName) {
+	const itemLower = String(itemName || "").toLowerCase()
+
+	if (itemLower.includes("gloves")) {
+		return "gloves"
+	}
+
+	if (
+		itemLower.includes("boots") ||
+		itemLower.includes("hooves")
+	) {
+		return "boots"
+	}
+
+	if (
+		itemLower.includes("helmet") ||
+		itemLower.includes("mask") ||
+		itemLower.includes("respirator")
+	) {
+		return "helmet"
+	}
+
+	if (itemLower.includes("pants")) {
+		return "pants"
+	}
+
+	if (
+		itemLower.includes("body") ||
+		itemLower.includes("apron") ||
+		itemLower.includes("vest") ||
+		itemLower.includes("mail") ||
+		itemLower.includes("suit") ||
+		itemLower.includes("jacket")
+	) {
+		return "body_armor"
+	}
+
+	return null
+}
+
+function getWeaponBonus(bonusName, numericValue) {
+	const general = weaponBonuses?.general?.[bonusName]
+
+	if (general) {
+		const tiers = ["yellow", "orange", "red"]
+			.filter(tier => general[tier])
+			.sort((a, b) => general[a].min - general[b].min)
+
+		let color = null
+		let range = null
+
+		for (const tier of tiers) {
+			if (numericValue >= general[tier].min) {
+				color = tier
+				range = general[tier]
+			}
+		}
+
+		return { color, range }
+	}
+
+	const special = weaponBonuses?.special?.[bonusName]
+
+	if (special) {
+		if (
+			numericValue >= special.min &&
+			numericValue <= special.max
+		) {
+			return {
+				color: "orange",
+				range: special
+			}
+		}
+	}
+
+	return null
+}
 
 function createBonusBadge(value, bonus_name, item_name) {
 	const isDarkMode = document.body.classList.contains("dark-mode")
@@ -1277,218 +431,59 @@ function createBonusBadge(value, bonus_name, item_name) {
 
 	let gradient = "linear-gradient(90deg, #333, #3a3a3a)"
 
-	// --------------------------------------------------
 	// Determine item slot
-	// --------------------------------------------------
+	const itemSlot = getItemSlot(item_name)
 
-	const itemLower = String(item_name || "").toLowerCase()
-
-	let itemSlot = null
-
-    if (itemLower.includes("gloves")) {
-        itemSlot = "gloves"
-    } else if (
-        itemLower.includes("boots") ||
-        itemLower.includes("hooves")
-              ) {
-        itemSlot = "boots"
-    } else if (
-        itemLower.includes("helmet") ||
-        itemLower.includes("mask") ||
-        itemLower.includes("respirator")
-    ) {
-        itemSlot = "helmet"
-    } else if (itemLower.includes("pants")) {
-        itemSlot = "pants"
-    } else if (
-        itemLower.includes("body") ||
-        itemLower.includes("apron") ||
-        itemLower.includes("vest") ||
-        itemLower.includes("mail") ||
-        itemLower.includes("suit") ||
-        itemLower.includes("jacket")
-    ) {
-        itemSlot = "body_armor"
-    }
-
-	// --------------------------------------------------
-	// Find armor bonus specifically for this slot
-	// --------------------------------------------------
-
+	// Find armor bonus
 	const armorBonus = Object.values(armorBonuses).find(b =>
-                                                        b?.name?.trim().toLowerCase() === bonusName &&
-                                                        b?.slots?.includes(itemSlot)
-                                                       )
+		b?.name?.trim().toLowerCase() === bonusName &&
+		b?.slots?.includes(itemSlot)
+	)
 
-	// --------------------------------------------------
 	// Find weapon bonus
-	// --------------------------------------------------
+	const weaponBonus = getWeaponBonus(bonusName, numericValue)
 
-	const weaponBonus =
-		weaponBonuses?.general?.[bonusName] ||
-		weaponBonuses?.special?.[bonusName]
+	if (!armorBonus && !weaponBonus) {
+		console.log("No matching armor or weapon bonus:", {
+			bonus_name,
+			item_name,
+			bonusName,
+			itemSlot,
+			armorBonus,
+			weaponBonus
+		})
+	}
 
-    if (!armorBonus && !weaponBonus) {
-	console.log("No matching armor or weapon bonus:", {
-		bonus_name,
-		item_name,
-		bonusName,
-		itemSlot,
-		armorBonus,
-		weaponBonus
-	})
-}
-
-	// --------------------------------------------------
 	// ARMOR
-	// --------------------------------------------------
-
 	if (armorBonus) {
-		if (bonusColorsEnabled) {
-			const percent = armorBonus.max > armorBonus.min
-				? Math.min(
-					Math.max(
-						((numericValue - armorBonus.min) /
-							(armorBonus.max - armorBonus.min)) * 100,
-						0
-					),
-					100
-				)
-				: 100
+		gradient = createBonusGradient(
+			numericValue,
+			armorBonus.min,
+			armorBonus.max,
+			armorBonus.color
+		)
+	}
 
-			const colors = {
-				red: {
-					fill: "rgba(180,0,40,0.75)",
-					base: "rgba(128,0,32,0.2)"
-				},
-				orange: {
-					fill: "rgba(191,111,0,0.75)",
-					base: "rgba(191,111,0,0.2)"
-				},
-				yellow: {
-					fill: "rgba(191,191,0,0.75)",
-					base: "rgba(191,191,0,0.2)"
-				}
-			}
+	// WEAPON
+	else if (weaponBonus) {
+		const { color, range } = weaponBonus
 
-			const selected = colors[armorBonus.color]
-
-			if (selected) {
-				gradient = `linear-gradient(
-					90deg,
-					${selected.fill} 0%,
-					${selected.fill} ${percent - 0.1}%,
-					${selected.base} ${percent + 0.1}%,
-					${selected.base} 101%
-				)`
-			}
+		if (color && range) {
+			gradient = createBonusGradient(
+				numericValue,
+				range.min,
+				range.max,
+				color
+			)
 		}
 	}
 
-	// --------------------------------------------------
-    // WEAPON
-    // --------------------------------------------------
+	const unit = UNIT_OVERRIDES[bonusName] || "%"
+    const isStatic = STATIC_BONUSES.has(bonusName)
 
-    else if (weaponBonus && bonusColorsEnabled) {
-        let color = null
-        let range = null
-
-        // General weapon bonus
-        if (weaponBonuses.general?.[bonusName]) {
-            const ranges = weaponBonuses.general[bonusName]
-
-            // Check highest color first
-            if (
-                ranges.red &&
-                numericValue >= ranges.red.min &&
-                numericValue <= ranges.red.max
-            ) {
-                color = "red"
-                range = ranges.red
-            } else if (
-                ranges.orange &&
-                numericValue >= ranges.orange.min &&
-                numericValue <= ranges.orange.max
-            ) {
-                color = "orange"
-                range = ranges.orange
-            } else if (
-                ranges.yellow &&
-                numericValue >= ranges.yellow.min &&
-                numericValue <= ranges.yellow.max
-            ) {
-                color = "yellow"
-                range = ranges.yellow
-            }
-        }
-
-        // Special weapon bonus
-        else if (weaponBonuses.special?.[bonusName]) {
-            range = weaponBonuses.special[bonusName]
-
-            if (
-                numericValue >= range.min &&
-                numericValue <= range.max
-            ) {
-                color = "orange"
-            }
-        }
-
-        if (color && range) {
-            const percent = range.max > range.min
-            ? Math.min(
-                Math.max(
-                    ((numericValue - range.min) /
-                     (range.max - range.min)) * 100,
-                    0
-                ),
-                100
-            )
-            : 100
-
-            const colors = {
-                red: {
-                    fill: "rgba(180,0,40,0.75)",
-                    base: "rgba(128,0,32,0.2)"
-                },
-                orange: {
-                    fill: "rgba(191,111,0,0.75)",
-                    base: "rgba(191,111,0,0.2)"
-                },
-                yellow: {
-                    fill: "rgba(191,191,0,0.75)",
-                    base: "rgba(191,191,0,0.2)"
-                }
-            }
-
-            const selected = colors[color]
-
-            if (selected) {
-                gradient = `linear-gradient(
-				90deg,
-				${selected.fill} 0%,
-				${selected.fill} ${percent - 0.1}%,
-				${selected.base} ${percent + 0.1}%,
-				${selected.base} 101%
-			)`
-            }
-        }
-    }
-
-	// --------------------------------------------------
-	// Text
-	// --------------------------------------------------
-
-	const unitOverrides = {
-		disarm: "T",
-		freeze: "s"
-	}
-
-	const unit = unitOverrides[bonusName] || "%"
-
-	if (bonusName === "irradiate" || bonusName === "smash" || bonusName === "radiation protection") {
+	if (isStatic) {
 		badge.textContent = bonus_name
-        gradient = "rgba(191,111,0,0.75)"
+		gradient = "rgba(191,111,0,0.75)"
 	} else {
 		badge.textContent = `${numericValue}${unit} ${bonus_name}`
 	}
@@ -1507,143 +502,96 @@ const isMobile = () =>
     (navigator.maxTouchPoints > 0 && window.innerWidth <= 768);
 
 
-// AUCTION HOUSE ========================================================================================================
+// AUCTION HOUSE / AMARKET ========================================================================================================
 
 function amarket() {
-	$(".t-gray-6").html("") // Clear previous content
+  document.querySelectorAll(".t-gray-6").forEach((el) => (el.innerHTML = ""));
 
-	const rows = $(".bonus-attachment-icons").parents("div.item-cont-wrap")
-	if (rows.length === 0) return
+  const iconSpans = document.querySelectorAll("span.bonus-attachment-icons");
+  const uniqueRows = new Set(
+    Array.from(iconSpans)
+      .map((icon) => icon.closest("div.item-cont-wrap"))
+      .filter(Boolean),
+  );
 
-	for (let i = 0; i < rows.length; i++) {
-		const row = rows[i]
-		const container = $(row).find("p.t-gray-6")[0]
-		const icons = $(row).find("span.bonus-attachment-icons")
+  for (const row of uniqueRows) {
+    const container = row.querySelector("p.t-gray-6");
+    const icons = row.querySelectorAll("span.bonus-attachment-icons");
 
-		if (!container || icons.length === 0) continue
+    if (!container || icons.length === 0) continue;
 
-		container.innerHTML = ""
+    container.style.display = "flex";
+    container.style.flexDirection = "row";
+    container.style.flexWrap = "wrap";
+    container.style.alignItems = "center";
+    container.style.justifyContent = "flex-start";
+    container.style.gap = "4px";
+    container.style.marginTop = "2px";
 
-		let bonus1 = "",
-			bonus2 = ""
+    const nameNode = row.querySelector("[class*=name]");
+    const item_name = nameNode ? nameNode.textContent.trim() : "";
 
-		// First bonus
-		if (icons[0]) {
-			const title1 = icons[0].title
-			if (title1) {
-				const name1 = title1.split(">")[1]?.split("<")[0]
-				const value1 = format(title1, name1)
-				bonus1 = value1 + name1
-			}
-		}
+    const processIcon = (icon) => {
+      if (!icon || !icon.title) return;
+      const name = icon.title.split(">")[1]?.split("<")[0];
+      if (!name) return;
+      const value = format(icon.title, name);
+      const badge = createBonusBadge(value, trueName(name), item_name);
+      badge.style.margin = "0";
+      container.appendChild(badge);
+    };
 
-		// Second bonus
-		if (icons[1]) {
-			const title2 = icons[1].title
-			if (title2) {
-				const name2 = title2.split(">")[1]?.split("<")[0]
-				const value2 = format(title2, name2)
-				bonus2 = value2 + name2
-			}
-		}
-
-		// Output: Second bonus first
-		container.innerHTML = bonus2
-			? bonus1
-				? bonus2 + "<br>" + bonus1
-				: bonus2
-			: bonus1
-
-		// === Set background color and border based on glow class ===
-		const glow = row.querySelector(".item-plate")
-
-		row.classList.remove(
-			"glow-yellow-style",
-			"glow-orange-style",
-			"glow-red-style",
-		)
-
-		if (glow?.classList.contains("glow-yellow")) {
-			row.classList.add("glow-yellow-style")
-		} else if (glow?.classList.contains("glow-orange")) {
-			row.classList.add("glow-orange-style")
-		} else if (glow?.classList.contains("glow-red")) {
-			row.classList.add("glow-red-style")
-		}
-	}
+    if (icons[0]) processIcon(icons[0]);
+    if (icons[1]) processIcon(icons[1]);
+  }
 }
-
-// AUCTION HOUSE ========================================================================================================
 
 // DISPLAY ========================================================================================================
 
 function displaycase() {
-	const items = $(".bonus-attachment-icons").parents("div.iconsbonuses")
-	if (items.length === 0) return
+  const iconSpans = document.querySelectorAll("span.bonus-attachment-icons");
+  const uniqueItems = new Set(
+    Array.from(iconSpans)
+      .map((icon) => icon.closest("div.iconsbonuses"))
+      .filter(Boolean),
+  );
 
-	for (let i in items) {
-		if (!isIntNumber(i)) continue
+  for (const item of uniqueItems) {
+    const bonusIcons = item.querySelectorAll("span.bonus-attachment-icons");
+    if (bonusIcons.length === 0) continue;
 
-		const bonusIcons = $(items[i]).find("span.bonus-attachment-icons")
-		if (bonusIcons.length === 0) continue
+    item
+      .querySelectorAll("div.custom-bonus-badge")
+      .forEach((el) => el.remove());
 
-		// Remove all existing custom badges or labels
-		bonusIcons.find("div.custom-bonus-badge").remove()
+    const nameNode = bonusIcons[0]
+      .closest(".torn-divider")
+      ?.querySelector("[class*=name]");
+    const item_name = nameNode ? nameNode.childNodes[3]?.textContent : "";
 
-        const item_name = bonusIcons[0].parentElement.parentElement.parentElement.querySelector('[class*=name]').childNodes[3].textContent
+    const first = bonusIcons[0];
+    if (first && first.title) {
+      let name1 = first.title.split(">")[1]?.split("<")[0];
+      if (name1) {
+        let value1 = format(first.title, name1);
+        const badge1 = createBonusBadge(value1, trueName(name1), item_name);
+        badge1.style.marginLeft = "4px";
+        first.appendChild(badge1);
+      }
+    }
 
-		const first = bonusIcons[0]
-		if (!first || !first.title) continue
-
-		let name1 = first.title.split(">")[1]?.split("<")[0]
-		if (!name1) continue
-
-		let value1 = format(first.title, name1)
-		name1 = trueName(name1)
-
-		// 🔹 Use badge instead of span
-		const badge1 = createBonusBadge(value1, name1, item_name)
-		badge1.style.lineHeight = "1em"
-		badge1.style.padding = "2px 3px"
-		first.appendChild(badge1)
-
-		const second = bonusIcons[1]
-		if (second && second.title) {
-			let name2 = second.title.split(">")[1]?.split("<")[0]
-			let value2 = format(second.title, name2)
-			name2 = trueName(name2)
-
-			// 🔹 Second badge
-			const badge2 = createBonusBadge(value2, name2, item_name)
-			badge1.style.lineHeight = "1em"
-			badge1.style.padding = "2px 3px"
-			second.appendChild(badge2)
-		}
-	}
+    const second = bonusIcons[1];
+    if (second && second.title) {
+      let name2 = second.title.split(">")[1]?.split("<")[0];
+      if (name2) {
+        let value2 = format(second.title, name2);
+        const badge2 = createBonusBadge(value2, trueName(name2), item_name);
+        badge2.style.marginLeft = "4px";
+        second.appendChild(badge2);
+      }
+    }
+  }
 }
-
-function observeDarkModeToggle() {
-	const observer = new MutationObserver((mutations) => {
-		for (const mutation of mutations) {
-			if (
-				mutation.type === "attributes" &&
-				mutation.attributeName === "class"
-			) {
-				const hasDark = document.body.classList.contains("dark-mode")
-				if (document.URL.includes("display")) displaycase() // Re-apply correct styles
-			}
-		}
-	})
-
-	observer.observe(document.body, {
-		attributes: true,
-		attributeFilter: ["class"],
-	})
-}
-
-observeDarkModeToggle()
-
-// DISPLAY ========================================================================================================
 
 // BAZAAR ========================================================================================================
 
@@ -1699,8 +647,6 @@ observer.observe(document.body, {
 	attributeFilter: ["class"],
 	subtree: false,
 })
-
-// BAZAAR ========================================================================================================
 
 function manage(triggered) {
 	if (triggered && triggered[0]) {
@@ -1878,9 +824,7 @@ function armory(triggered) {
 	}
 }
 
-// ARMORY ========================================================================================================
-
-// INVENTORY BAZAAR ========================================================================================================
+// INVENTORY BAZAAR-ADD ========================================================================================================
 
 function inventoryandbazaar(triggered) {
 	const link = document.URL
@@ -1990,8 +934,6 @@ function inventoryandbazaar(triggered) {
 		}
 	}
 }
-
-// INVENTORY BAZAAR ========================================================================================================
 
 // ITEM MARKET ========================================================================================================
 
@@ -2198,118 +1140,83 @@ darkModeObserver.observe(document.body, {
 	attributeFilter: ["class"],
 })
 
-// ITEM MARKET ========================================================================================================
+// FORMATTING & HELPERS ================================================================================================
 
-// FORMATTING ========================================================================================================
+const executeFormatting = (str, name) => {
+  if (STATIC_BONUSES.has(name.toLowerCase())) return "";
+  const specialHandlers = {
+    Disarm: () => str.split(" turns")[0]?.split("for ")[1] + " T ",
+    Bloodlust: () => str.split(" of")[0]?.split("by ")[1] + " ",
+    Execute: () => str.split(" life")[0]?.split("below ")[1] + " ",
+    Penetrate: () => str.split(" of")[0]?.split("Ignores ")[1] + " ",
+    Eviscerate: () => str.split(" extra")[0]?.split("them ")[1] + " ",
+    Poison: () =>
+      (str.includes("</b><br/>")
+        ? str.split(" chance to Poison")[0]?.split("</b><br/>")[1]
+        : str.split(" chance to Poison")[0]) + " ",
+  };
+  if (specialHandlers[name]) {
+    try {
+      return specialHandlers[name]() || "";
+    } catch (e) {
+      return "";
+    }
+  }
+  try {
+    if (str.includes(">"))
+      return (str.split(">")[3]?.split("%")[0] || "") + "% ";
+    return str.split("%")[0] + "% ";
+  } catch (e) {
+    return "";
+  }
+};
 
 function format(title, name) {
-	const excludedNames = [
-		"Irradiate",
-		"Smash",
-		"Dimensiokinesis",
-		"Oneirokinesis",
-	]
-	if (excludedNames.includes(name)) return ""
-
-	const specialHandlers = {
-		Disarm: () => title.split(" turns")[0]?.split("for ")[1] + " T ",
-		Bloodlust: () => title.split(" of")[0]?.split("by ")[1] + " ",
-		Execute: () => title.split(" life")[0]?.split("below ")[1] + " ",
-		Penetrate: () => title.split(" of")[0]?.split("Ignores ")[1] + " ",
-		Eviscerate: () => title.split(" extra")[0]?.split("them ")[1] + " ",
-		Poison: () =>
-			title.split(" chance to Poison")[0]?.split("</b><br/>")[1] + " ",
-	}
-
-	if (specialHandlers[name]) {
-		try {
-			return specialHandlers[name]() || ""
-		} catch (e) {
-			console.warn(`Format error for "${name}":`, e)
-			return ""
-		}
-	}
-
-	// Default fallback (tries to extract % value from HTML-ish string)
-	try {
-		const raw = title.split(">")[3]?.split("%")[0]
-		return raw ? raw + "% " : ""
-	} catch (e) {
-		console.warn("Default format parsing failed:", e)
-		return ""
-	}
+  return executeFormatting(title, name);
 }
-
 function formatNew(desc, name) {
-	const specialHandlers = {
-		Disarm: () => desc.split(" turns")[0]?.split("for ")[1] + " T ",
-		Bloodlust: () => desc.split(" of")[0]?.split("by ")[1] + " ",
-		Execute: () => desc.split(" life")[0]?.split("below ")[1] + " ",
-		Penetrate: () => desc.split(" of")[0]?.split("Ignores ")[1] + " ",
-		Eviscerate: () => desc.split(" extra")[0]?.split("them ")[1] + " ",
-		Poison: () => desc.split(" chance to Poison")[0] + " ",
-	}
-
-	const excludedNames = [
-		"Irradiate",
-		"Smash",
-		"Dimensiokinesis",
-		"Oneirokinesis",
-	]
-
-	if (excludedNames.includes(name)) return ""
-
-	if (specialHandlers[name]) {
-		try {
-			return specialHandlers[name]() || ""
-		} catch (e) {
-			console.warn(`Failed to format "${name}": ${e}`)
-			return ""
-		}
-	}
-
-	return desc.split("%")[0] + "% "
+  return executeFormatting(desc, name);
 }
 
 function trueName(text) {
-	const map = {
-		Full: "EOD",
-		Negative: "Delta",
-		Poisoned: "Poison",
-	}
-
-	return map[text] || text
+  const map = { Full: "EOD", Negative: "Delta", Poisoned: "Poison" };
+  return map[text] || text;
 }
 
-// FORMATTING ========================================================================================================
-
+// OBSERVER ========================================================================================================
 const observerMap = {
-	".item-cont-wrap": amarket,
-	".display-main-page": displaycase,
-	"[class*='iconBonuses___']": bazaar,
-	"[class*='extraBonusIcon___']": manage,
-	".bonuses-wrap": inventoryandbazaar,
-	".bonus": armory,
-	"[class*='itemTile___']": newItemMarket
-	// ".properties___wA7fL": addItem
-}
+  ".item-cont-wrap": amarket,
+  ".display-main-page": displaycase,
+  "[class*='iconBonuses___']": bazaar,
+  "[class*='extraBonusIcon___']": manage,
+  ".bonuses-wrap": inventoryandbazaar,
+  ".bonus": armory,
+  "[class*='itemTile___']": newItemMarket,
+};
 
-const seenElements = new WeakSet()
+const seenElements = new WeakSet();
 
 const process = () => {
-	for (const [selector, callback] of Object.entries(observerMap)) {
-		document.querySelectorAll(selector).forEach((el) => {
-			if (!seenElements.has(el)) {
-				seenElements.add(el)
-				callback([el]) // ⬅️ wrap element in array for compatibility
-			}
-		})
-	}
-}
+  for (const [selector, callback] of Object.entries(observerMap)) {
+    document.querySelectorAll(selector).forEach((el) => {
+      if (!seenElements.has(el)) {
+        seenElements.add(el);
+        callback([el]);
+      }
+    });
+  }
+};
 
-// Observe DOM changes
-const mainObserver = new MutationObserver(process)
-mainObserver.observe(document.body, { childList: true, subtree: true })
-
-// Initial check
-process()
+// Debounced Observer to drastically reduce CPU overhead during heavy DOM modifications
+let isProcessing = false;
+const mainObserver = new MutationObserver(() => {
+  if (!isProcessing) {
+    isProcessing = true;
+    requestAnimationFrame(() => {
+      process();
+      isProcessing = false;
+    });
+  }
+});
+mainObserver.observe(document.body, { childList: true, subtree: true });
+process();
