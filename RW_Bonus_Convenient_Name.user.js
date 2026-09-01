@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      8.1.0
+// @version      8.1.1
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -1034,105 +1034,96 @@ function newItemMarket(triggered) {
 }
 
 function addItem(triggered) {
-	const row = triggered[0]
+	const row = triggered?.[0]
 	if (!row) return
-	// avoid adding the same text multiple times
+
+	// Avoid adding the same label multiple times
 	if (row.getAttribute("data-label-added") === "true") return
-	const bonusElement = row?.childNodes[3]?.childNodes[0]
-	const bonusDoesNotExist =
-		row?.childNodes[3]?.childNodes[0]?.className.includes(
-			"bonus-attachment-blank-bonus-25",
-		)
-	if (bonusDoesNotExist) {
+
+	const bonusElement = row?.childNodes?.[3]?.childNodes?.[0]
+	if (!bonusElement) return
+
+	// Skip items with no bonus
+	if (bonusElement.classList.contains("bonus-attachment-blank-bonus-25")) {
 		return
 	}
+
 	const parentElement =
-		row?.parentElement?.parentElement?.parentElement?.childNodes[0]
-			?.childNodes[1]?.childNodes[0]
+		row?.parentElement?.parentElement?.parentElement?.childNodes?.[0]
+			?.childNodes?.[1]?.childNodes?.[0]
+
+	if (!parentElement) return
 
 	const parseBonus = (el) => {
-		if (!el || el.classList.contains("bonus-attachment-blank-bonus-25"))
+		if (!el || el.classList.contains("bonus-attachment-blank-bonus-25")) {
 			return null
+		}
+
 		const cls = [...el.classList].find((c) =>
 			c.startsWith("bonus-attachment-"),
 		)
+
 		if (!cls) return null
-		const name = cls.replace("bonus-attachment-", "")
+
+		const name = cls.replace("bonus-attachment-", "").trim()
+
 		return [
-			format(cls.trim(), name.trim()),
-			trueName(
-				name.trim().charAt(0).toUpperCase() + name.trim().slice(1),
-			),
+			format(cls, name),
+			trueName(name.charAt(0).toUpperCase() + name.slice(1)),
 		]
 			.filter(Boolean)
 			.join(" ")
 	}
 
+	const bonuses = []
+
 	// Primary bonus
-	const bonuses = [parseBonus(bonusElement)]
+	const primaryBonus = parseBonus(bonusElement)
+	if (primaryBonus) {
+		bonuses.push(primaryBonus)
+	}
 
 	// Secondary bonus
-	const nextBonus = bonuses?.parentElement?.childNodes[1]
-	if (nextBonus && !nextBonus.className?.includes("blank-bonus")) {
-		const parsed = parseBonus(nextBonus)
-		if (parsed) bonuses.push(parsed)
+	const nextBonus = bonusElement?.parentElement?.childNodes?.[1]
+
+	if (
+		nextBonus &&
+		!nextBonus.className?.includes("blank-bonus")
+	) {
+		const secondaryBonus = parseBonus(nextBonus)
+
+		if (secondaryBonus) {
+			bonuses.push(secondaryBonus)
+		}
 	}
 
-	// Build and append single span
-	if (bonuses[0]) {
-		parentElement.innerHTML += "<br>"
-		parentElement.className += " custom-bonus-label"
-		parentElement.textContent += ` (${bonuses.join(", ")})`
-	}
-	// after you append the label:
+	// Nothing to add
+	if (!bonuses.length) return
+
+	// Add the label without rebuilding the existing HTML
+	parentElement.appendChild(document.createElement("br"))
+	parentElement.classList.add("custom-bonus-label")
+	parentElement.appendChild(
+		document.createTextNode(` (${bonuses.join(", ")})`),
+	)
+
+	// Mark row as processed
 	row.setAttribute("data-label-added", "true")
 }
 
-function rerunNewItemMarket() {
-	document.querySelectorAll(".itemTile___cbw7w").forEach((el) => {
-		// existing bonus area detection (keeps your fallback)
-		const bonusArea =
-			el.querySelector(".bonuses-wrap") ||
-			el.childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0]
-				?.childNodes?.[0]
-
-		// Remove custom-bonus-labels (from addItem)
-		bonusArea
-			?.querySelectorAll(".custom-bonus-label")
-			.forEach((span) => span.remove())
-
-		// Remove badges appended to appendNode (walk up from left column similar to newItemMarket)
-		try {
-			const bonusContainer =
-				el.childNodes?.[0]?.childNodes?.[2]?.childNodes?.[0]
-			const leftColumn = bonusContainer?.childNodes?.[0]
-			const appendNode =
-				leftColumn?.parentElement?.parentElement?.parentElement
-					?.parentElement
-			if (appendNode) {
-				appendNode
-					.querySelectorAll(".custom-bonus-badge")
-					.forEach((node) => node.remove())
-			}
-		} catch (e) {
-			// if structure differs, fall back to scanning the tile for badges
-			el.querySelectorAll(".custom-bonus-badge").forEach((node) =>
-				node.remove(),
-			)
-		}
-
-		// Clear processed flag so newItemMarket can re-add (useful for dark mode or full reruns)
-		el.removeAttribute("data-badge-added")
-
-		// Re-run to add fresh badges
-		newItemMarket([el])
-	})
-}
-
 let darkModeTimer
+
 const darkModeObserver = new MutationObserver(() => {
 	clearTimeout(darkModeTimer)
-	darkModeTimer = setTimeout(rerunNewItemMarket, 50) // slight debounce
+
+	darkModeTimer = setTimeout(() => {
+		const isDarkMode = document.body.classList.contains("dark-mode")
+
+		document.querySelectorAll(".custom-bonus-badge, .custom-bonus-label").forEach((el) => {
+			el.classList.toggle("dark-mode", isDarkMode)
+			el.classList.toggle("light-mode", !isDarkMode)
+		})
+	}, 50)
 })
 
 darkModeObserver.observe(document.body, {
