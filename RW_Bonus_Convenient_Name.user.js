@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RW Bonus Convenient Name
 // @namespace    https://github.com/RyuFive/TornScripts
-// @version      8.1.2
+// @version      8.1.3
 // @description  Displays RW bonus values with convenient names across Torn pages.
 // @author       RyuFive
 // @match        https://www.torn.com/displaycase.php*
@@ -262,16 +262,25 @@ function amarket() {
 
         const processIcon = (icon) => {
             if (!icon || !icon.title) return
+
             const name = icon.title.split(">")[1]?.split("<")[0]
             if (!name) return
+
             const value = format(icon.title, name)
             const badge = createBonusBadge(value, trueName(name), item_name)
+
             badge.style.margin = "0"
             container.appendChild(badge)
         }
 
         if (icons[0]) processIcon(icons[0])
         if (icons[1]) processIcon(icons[1])
+
+        const glow = row.querySelector(".item-plate")
+
+        if (glow?.classList.contains("glow-yellow")) row.classList.add("glow-yellow-style")
+        else if (glow?.classList.contains("glow-orange")) row.classList.add("glow-orange-style")
+        else if (glow?.classList.contains("glow-red")) row.classList.add("glow-red-style")
     }
 }
 
